@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ProjetoEstoque"
+version = "0.1.0"
+description = ""
+authors = ["Yuri-Gabriel <yurigabriel.f1012@gmail.com>", "jaspionU2 <gameraleatorio2202@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard", "uvicorn"], version = "^0.115.5"}
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+psycopg2-binary = "^2.9.5"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.36"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
