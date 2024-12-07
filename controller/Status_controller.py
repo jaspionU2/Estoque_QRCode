@@ -3,9 +3,9 @@ from fastapi import APIRouter, Response, status
 router_status_dispositivo = APIRouter()  
 
 @router_status_dispositivo.get("/getAllStatus")
-async def get(res: Response) -> list:
+async def get(res: Response) -> str:
     status_dispositivo = [""] # service.getAllStatus_dispositivo()
-    return status_dispositivo
+    return "ihkaklhaklhaalhskaljhsk"
 
 @router_status_dispositivo.post("/addNewStatus_dispositivo")
 async def create(new_status_dispositivo: dict, res: Response) -> None:
