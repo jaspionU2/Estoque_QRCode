@@ -9,3 +9,6 @@ alembic.ini
 
 #ignore variaveis de ambiente
 .env
+
+#ignore __pycache__
+__pycache__
