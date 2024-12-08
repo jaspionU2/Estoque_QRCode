@@ -11,4 +11,4 @@ alembic.ini
 .env
 
 #ignore __pycache__
-__pycache__
+__pycache__/
