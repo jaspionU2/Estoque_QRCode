@@ -3,3 +3,9 @@ poetry.lock
 
 #ignore ambiente virtual
 .venv
+
+#ignore alembic.ini
+alembic.ini
+
+#ignore variaveis de ambiente
+.env
