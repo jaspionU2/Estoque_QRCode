@@ -1,17 +1,8 @@
-from datetime import datetime
-
-from typing import Literal, get_args
-
 from sqlalchemy import (String, ForeignKey)
 from sqlalchemy.orm import (registry, Mapped, mapped_column,)
-
-from model.Model_Categoria import Categoria
-from model.Model_Status import Status
-
-table_register = registry()
-
+from configs.register import table_register
 @table_register.mapped_as_dataclass
-class Equipamento:
+class Equipamento():
     __tablename__ = 'equipamento'
     
     id: Mapped[int] = mapped_column(init=False, primary_key=True, name='id_equipamento')
@@ -19,3 +10,5 @@ class Equipamento:
     matricula: Mapped[str] = mapped_column(String(5), nullable=False, name='matricula_equipamento')
     categoria: Mapped[int] = mapped_column(ForeignKey('categoria.id_categoria'), name='id_categoria')
     status: Mapped[int] = mapped_column(ForeignKey('status.id_status'), name='id_status')
+
+metadata = table_register.metadata
