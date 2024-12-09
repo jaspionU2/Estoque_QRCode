@@ -1,5 +1,12 @@
 from fastapi import APIRouter, Response, status  
+from services import Usuarios_service
 
+# class UsuarioService:
+#     def __init__(self):
+#         self.UsuarioService = Usuarios_service
+   
+    
+# usuario = UsuarioService().UsuarioService
 router_usuario = APIRouter()  
 
 @router_usuario.get('/getAllProfessores')
@@ -37,7 +44,7 @@ async def delete(id: int, res: Response) -> None:
 
 @router_usuario.get('/getAllAlunos')
 async def get_alunos(res: Response) -> list:
-    Alunos = [{}] #service.getAllAlunos()
+    Alunos = await Usuarios_service.getAllAlunos() #service.getAllAlunos()
     res.status_code = status.HTTP_200_OK
     return Alunos
 
@@ -47,16 +54,16 @@ async def create_aluno(new_aluno: dict, res: Response) -> None:
         res.status_code = status.HTTP_400_BAD_REQUEST
         return None
     
-    # service.createAluno(new_aluno)
+    await Usuarios_service.createAluno(new_aluno)
     res.status_code = status.HTTP_201_CREATED
 
-@router_usuario.put('/updateAluno') 
-async def update_aluno(new_values: dict, res: Response) -> None:
+@router_usuario.put('/updateAluno/{id}') 
+async def update_aluno(id: int, new_values: dict, res: Response) -> None:
     if new_values == None:
         res.status_code = status.HTTP_400_BAD_REQUEST
         return None
     
-    # service.updateAluno(new_values)
+    await Usuarios_service.updateAluno(id, new_values)
     res.status_code = status.HTTP_200_OK
 
 @router_usuario.delete('/deleteAluno/{id}')
@@ -65,5 +72,5 @@ async def delete(id: int, res: Response) -> None:
         res.status_code = status.HTTP_406_NOT_ACCEPTABLE
         return None
     
-    # sevice.deleteAluno(id)
+    await Usuarios_service.deleteAluno(id)
     res.status_code = status.HTTP_200_OK
