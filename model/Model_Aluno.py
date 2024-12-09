@@ -16,5 +16,5 @@ class Aluno():
     nome: Mapped[str] = mapped_column(String(100), nullable=False, name='nome_aluno')
     serie: Mapped[Enum] = mapped_column(sqlalchemy.Enum('6', '7', '8', '9', name='serie_enum'), nullable=False, name='serie_aluno')
     turma: Mapped[Enum] = mapped_column(sqlalchemy.Enum('A', 'B', name='turma_enum'), nullable=False, name='turma_aluno')
-    created_at: Mapped[datetime] = mapped_column(name='created_at', server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(name='created_at', server_default=func.now(), init=False)
     

@@ -7,17 +7,15 @@ from alembic import context
 
 from dotenv import load_dotenv
 
-import os
+from configs.settings import Config
 
 from configs.register import metadata
-
-from model import (Model_Aluno, Model_Professor, Model_Carregador, Model_Categoria, Model_Status, Model_Materia, Model_Professor_Materia, Model_Equipamento, Model_Usuario, Model_Atribuicao_permanente, Model_Emprestimo)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 load_dotenv()
-config.set_main_option('sqlalchemy.url', os.getenv('DB_URI'))
+config.set_main_option('sqlalchemy.url', Config().DB_URI)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
