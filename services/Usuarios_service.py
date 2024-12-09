@@ -1,61 +1,111 @@
 from sqlalchemy import create_engine, select, update, delete
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
-from configs.register import metadata
 from model.Model_Aluno import Aluno
+from model.Model_Professor import Professor
 
-engine = create_engine("postgresql+psycopg2://postgres:220206@localhost:5432/estoquemirim")
+engine = create_engine(Config().DB_URI)
 
+class Aluno_CRUD():
 
-async def getAllAlunos():
-    
-    with Session(engine) as session:
-                
-      return session.execute(select(Aluno)).scalars().all()
-  
-async def getAlunoById(Id: int):
-    
-    with Session(engine) as session:
+    async def getAllAlunos():
         
-      return session.execute(
-          select(Aluno).
-          where(Aluno.id == Id)).scalar_one_or_none()
-      
-async def createAluno(new_aluno: dict):
+        with Session(engine) as session:
+                    
+            return session.execute(select(Aluno)).scalars().all()
     
-    try:
+    async def getAlunoById(Id: int):
+        
         with Session(engine) as session:
             
-            aluno = Aluno(**new_aluno)
+            return session.execute(
+                select(Aluno).
+                where(Aluno.id == Id)).scalar_one_or_none()
+        
+    async def createAluno(new_aluno: list[dict]):
+        
+        try:
+            with Session(engine) as session:
+                
+                alunos = [Aluno(**data) for data in new_aluno]
+                
+                session.add_all(alunos)
+                session.commit()
+                return True
+        except SQLAlchemyError as e:
+            print(f"Erro ao criar professores: {e}")
+            return False
+        
+    async def updateAluno(Id: int, new_values: dict):
+        
+        with Session(engine) as session:
+        
+            aluno = Aluno(**new_values)
             
-            session.add(aluno)  
+            session.execute(update(Aluno).
+                            where(Aluno.id == Id).
+                            values(nome=aluno.nome,
+                                serie=aluno.serie,
+                                turma=aluno.turma))
             
             session.commit()
             
-            return True
-    except:
-        return False
+    async def deleteAluno(Id: int):
+        
+        with Session(engine) as session:
+            
+            session.execute(delete(Aluno).
+                            where(Aluno.id == Id))
+            
+            session.commit()
+            
+class Professor_CRUD:
     
-async def updateAluno(Id: int, new_values: dict):
+    async def getAllProfessores():
+        
+        with Session(engine) as session:
+                    
+            return session.execute(select(Professor)).scalars().all()
     
-    with Session(engine) as session:
-    
-        aluno = Aluno(**new_values)
+    async def getProfessorById(Id: int):
         
-        session.execute(update(Aluno).
-                        where(Aluno.id == Id).
-                        values(nome=aluno.nome,
-                               serie=aluno.serie,
-                               turma=aluno.turma))
+        with Session(engine) as session:
+            
+            return session.execute(
+                select(Professor).
+                where(Professor.id == Id)).scalar_one_or_none()
+            
+    async def createProfessor(new_professor: list[dict]) -> bool:
+        try:
+            with Session(engine) as session:
+                
+                professores = [Professor(**data) for data in new_professor]
+                
+                session.add_all(professores)
+                session.commit()
+                return True
+        except SQLAlchemyError as e:
+            print(f"Erro ao criar professores: {e}")
+            return False
         
-        session.commit()
+    async def updateProfessor(Id: int, new_values: dict):
         
-async def deleteAluno(Id: int):
-    
-    with Session(engine) as session:
+        with Session(engine) as session:
         
-        session.execute(delete(Aluno).
-                        where(Aluno.id == Id))
+            professor = Professor(**new_values)
+            
+            session.execute(update(Professor).
+                            where(Professor.id == Id).
+                            values(nome=professor.nome))
+            
+            session.commit()
+            
+    async def deleteProfessor(Id: int):
         
-        session.commit()
+        with Session(engine) as session:
+            
+            session.execute(delete(Professor).
+                            where(Professor.id == Id))
+            
+            session.commit()
