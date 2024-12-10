@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, select, update, delete
+from sqlalchemy import create_engine, select, update, delete, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
@@ -25,17 +25,13 @@ class Aluno_CRUD():
         
     async def createAluno(new_aluno: list[dict]):
         
-        try:
             with Session(engine) as session:
                 
-                alunos = [Aluno(**data) for data in new_aluno]
-                
-                session.add_all(alunos)
+                result = session.execute(insert(Aluno).
+                                values(new_aluno))
                 session.commit()
-                return True
-        except SQLAlchemyError as e:
-            print(f"Erro ao criar professores: {e}")
-            return False
+                return result.rowcount
+
         
     async def updateAluno(Id: int, new_values: dict):
         
@@ -57,7 +53,6 @@ class Aluno_CRUD():
             
             session.execute(delete(Aluno).
                             where(Aluno.id == Id))
-            
             session.commit()
             
 class Professor_CRUD:
@@ -77,17 +72,13 @@ class Professor_CRUD:
                 where(Professor.id == Id)).scalar_one_or_none()
             
     async def createProfessor(new_professor: list[dict]) -> bool:
-        try:
+       
             with Session(engine) as session:
                 
-                professores = [Professor(**data) for data in new_professor]
-                
-                session.add_all(professores)
+                result = session.execute(insert(Professor).
+                                values(new_professor))
                 session.commit()
-                return True
-        except SQLAlchemyError as e:
-            print(f"Erro ao criar professores: {e}")
-            return False
+                return result.rowcount
         
     async def updateProfessor(Id: int, new_values: dict):
         
