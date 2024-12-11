@@ -16,7 +16,7 @@ async def create(new_status_dispositivo: list[dict], res: Response) -> None:
     
     await Status_CRUD.createStatus(new_status_dispositivo)
 
-@router_status_dispositivo.delete("/deleteOneStatus_dispositivo{id}")
+@router_status_dispositivo.delete("/deleteOneStatus_dispositivo/{id}")
 async def delete(id: int, res: Response) -> None:
     if id == None and id < 1:
         res.status_code = status.HTTP_400_BAD_REQUEST
