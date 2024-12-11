@@ -7,19 +7,23 @@ router_equipamentos = APIRouter()
 @router_equipamentos.get('/getAllEquipamentos')
 async def get(res: Response) -> list:
     equipamentos = await Equipmanento_CRUD.getAllEquipamentos()
+    
+    if equipamentos is None:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return None
+    
     res.status_code = status.HTTP_200_OK
     return equipamentos
 
 @router_equipamentos.post('/createEquipmanento')
-async def create_chrome(new_equipmanento: list[Equipamento], res: Response) -> None:
+async def create(tipo_equipamento: int, new_equipmanento: list[Equipamento], res: Response):
     if new_equipmanento == None:
         res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
 
     await Equipmanento_CRUD.createEquipamento(new_equipmanento)
     
 @router_equipamentos.put("/updateEquipamento/{id}")
-async def update_chrome(id: int, new_values: Equipamento, res: Response) -> None:
+async def update(id: int, new_values: Equipamento, res: Response):
     if new_values == None:
         res.status_code = status.HTTP_400_BAD_REQUEST
         return None
@@ -27,7 +31,7 @@ async def update_chrome(id: int, new_values: Equipamento, res: Response) -> None
     await Equipmanento_CRUD.updateEquipamento(id, new_values)
     
 @router_equipamentos.delete("/deleteEquipamento/{id}")
-async def delete_chrome(id: int, res: Response) -> None:
+async def delete(id: int, res: Response):
     if id <= 0 or id == None:
         res.status_code = status.HTTP_406_NOT_ACCEPTABLE
         return None

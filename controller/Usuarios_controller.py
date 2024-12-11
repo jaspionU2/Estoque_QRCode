@@ -7,33 +7,55 @@ from model.Model_Professor import Professor
 router_usuario = APIRouter()  
 
 @router_usuario.get('/getAllProfessores')
-async def get_Professores(res: Response) -> list:
+async def get_Professores(res: Response) -> list[Professor]:
     professores = await Professor_CRUD.getAllProfessores()
+
+    if professores == None:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return None
+    
     res.status_code = status.HTTP_200_OK
     return professores
 
 @router_usuario.post('/createProfessor')
-async def create_professor(new_professores: list[dict], res: Response):
-    if not new_professores: 
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return
+async def create_professor(new_professor: dict, res: Response) -> dict:
+    if not new_professor or new_professor is {}: 
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return {
+            "message": "Ausencia de dados",
+            "created": False
+        }
         
-    success = await Professor_CRUD.createProfessor(new_professores)
+    success = await Professor_CRUD.createProfessor(new_professor)
     
     if success:
         res.status_code = status.HTTP_201_CREATED
-        return
-    else:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return
+        return {
+            "created": True
+        }
+        
+    res.status_code = status.HTTP_400_BAD_REQUEST
+    return {
+        "message": "Erro no processamento",
+        "created": False
+    }
 
 @router_usuario.put('/updateProfessor/{id}') 
-async def update_Professor(id: int, new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def update_Professor(id: int, new_values: dict, res: Response) -> dict:
+    if not new_values:
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return {
+            "message": "Ausencia de dados",
+            "updated": False
+        }
     
-    await Professor_CRUD.updateProfessor(id, new_values)
+    result = await Professor_CRUD.updateProfessor(id, new_values)
+    if not result:
+        res.status_code = status.HTTP_409_CONFLICT
+        return {
+            "message": "Erro ao atualizar os dados solicitados",
+            "updated": False
+        }
     res.status_code = status.HTTP_200_OK
 
 @router_usuario.delete('/deleteProfessor/{id}')

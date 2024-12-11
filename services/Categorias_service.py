@@ -10,27 +10,49 @@ engine = create_engine(Config().DB_URI)
 class Categoria_CRUD:
 
     async def getAllCategorias():
-
-        with Session(engine) as session:
-
-            return session.execute(select(Categoria)).scalars().all()
+        try:
+            with Session(engine) as session:
+                return session.execute(select(Categoria)).scalars().all()
+        except SQLAlchemyError as err:
+            session.rollback()
+            print(err._message())
+            print(err._sql_message())
+            return None
+        except Exception as err:
+            session.rollback()
+            print("Erro inesperado: {err}")
+            return False
 
     async def createCategoria(new_categoria: list[dict]):
-
-        with Session(engine) as session:
-
-            result = session.execute(insert(Categoria).
-                                     values(new_categoria))
-            session.commit()
-            
-            return result.rowcount
+        try:
+            with Session(engine) as session:
+                result = session.execute(insert(Categoria).
+                                        values(new_categoria))
+                session.commit()
+                return result.rowcount > 0
+        except SQLAlchemyError as err:
+            session.rollback()
+            print(err._message())
+            print(err._sql_message())
+            return None
+        except Exception as err:
+            session.rollback()
+            print("Erro inesperado: {err}")
+            return False
     
     async def deleteCategoria(Id: int):
-        
-        with Session(engine) as session:
-            
-            result = session.execute(delete(Categoria).
-                            where(Categoria.id == Id))
-            session.commit()
-            
-            return result       
+        try:
+            with Session(engine) as session:
+                result = session.execute(delete(Categoria).
+                                where(Categoria.id == Id))
+                session.commit()
+                return result.rowcount > 0
+        except SQLAlchemyError as err:
+            session.rollback()
+            print(err._message())
+            print(err._sql_message())
+            return None
+        except Exception as err:
+            session.rollback()
+            print("Erro inesperado: {err}")
+            return False     
