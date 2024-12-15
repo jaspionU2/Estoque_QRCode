@@ -63,11 +63,11 @@ CREATE TABLE professor_materia (
 CREATE TABLE usuario (
 	id_usuario SERIAL NOT NULL,
 	PRIMARY KEY(id_usuario),
-	id_aluno INTEGER NOT NULL,
+	id_aluno INTEGER,
 	FOREIGN KEY(id_aluno) REFERENCES aluno(id_aluno),
-	id_professor INTEGER NOT NULL,
+	id_professor INTEGER,
 	FOREIGN KEY(id_professor) REFERENCES professor(id_professor),
-	CONSTRAINT check_usuario CHECK (((id_aluno = 0) AND (id_professor <> 0)) OR ((id_aluno <> 0) AND (id_professor = 0))) --A xor B = ( A and not B) or ( not A and B)
+	CONSTRAINT check_usuario CHECK (((id_aluno = NULL) AND (id_professor <> NULL)) OR ((id_aluno <> NULL) AND (id_professor = NULL))) --A xor B = ( A and not B) or ( not A and B)
 );
 
 CREATE TABLE emprestimo (

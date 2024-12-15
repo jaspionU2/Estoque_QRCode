@@ -1,26 +1,64 @@
-from sqlalchemy import create_engine, select, update, delete, insert
+from sqlalchemy import create_engine, select, update, delete, insert, text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_Equipamento import Equipamento
-
+from model.Model_Carregador import Carregador
 engine = create_engine(Config().DB_URI)
 
 class Equipmanento_CRUD:
     
     async def getAllEquipamentos():
         try:
+            #with engine.connect() as conn:
+            #    result = conn.execute(select('*').select_from(text('getallequipamentos'))).all()
+            #    res = []
+            #    for row in result:
+            #        equi = Equipamento(numero_serie=row[1], matricula=row[2], categoria=row[3], status=row[4])
+            #        res.append(equi)
+            #    return res
             with Session(engine) as session:
-                return session.execute(select(Equipamento)).scalars().all()
+                query = select('*').select_from(text('getallequipamentos'))
+                result = session.execute(query).all()
+                res = []
+                obj = {}
+                for row in result:
+                    equi = Equipamento(
+                            numero_serie_equipamento=row[1],
+                            matricula_equipamento=row[2],
+                            id_categoria_equipamento=0,
+                            id_status_equipamento=0,
+                            categoria_equipamento=row[3],
+                            status_equipamento=row[4]
+                        ).__dict__
+                    equi.pop("id_categoria_equipamento")
+                    equi.pop("id_status_equipamento")
+                    #equi.id_equipamento = row[0]
+                    obj.update(equi)
+                    
+                    carregador = Carregador(
+                            matricula_carregador=row[5],
+                            id_status_carregador=0,
+                            status_carregador=row[6]
+                        ).__dict__
+                    carregador.pop("id_status_carregador")
+                    obj.update(dict.fromkeys(["carregador"], carregador))
+
+                    res.append(obj)
+                return res
+                
+                #for row in result:
+                #    print(row)
+                #return session.execute(select(Equipamento)).scalars().all()
         except SQLAlchemyError as err:
-            session.rollback()
+            #session.rollback()
             print(err._message())
             print(err._sql_message())
             return None
         except Exception as err:
-            session.rollback()
-            print("Erro inesperado: {err}")
-            return False
+            #session.rollback()
+            print("Erro inesperado: " + str(err))
+            return None
     async def createEquipamento(new_equipamento: list[Equipamento]):
         try:
             with Session(engine) as session:
@@ -85,5 +123,6 @@ class Equipmanento_CRUD:
             session.rollback()
             print("Erro inesperado: {err}")
             return False
+    
     
 

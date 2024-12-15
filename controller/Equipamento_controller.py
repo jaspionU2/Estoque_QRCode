@@ -5,7 +5,7 @@ from model.Model_Equipamento import Equipamento
 router_equipamentos = APIRouter()  
 
 @router_equipamentos.get('/getAllEquipamentos')
-async def get(res: Response) -> list:
+async def get(res: Response):
     equipamentos = await Equipmanento_CRUD.getAllEquipamentos()
     
     if equipamentos is None:

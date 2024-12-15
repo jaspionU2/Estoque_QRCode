@@ -10,5 +10,5 @@ class Professor():
     nome: Mapped[str] = mapped_column(String(100), name='nome_professor', nullable=False)
     # created_at: Mapped[datetime] = mapped_column(init=False, server_default=func.now())
     id_materia: Mapped[int] = mapped_column(name="id_materia")
-    materias: Mapped[list[str]] = relationship("Materia", back_populates="aluno")
+    #materias: Mapped[list[str]] = relationship("Materia", back_populates="aluno")
     
