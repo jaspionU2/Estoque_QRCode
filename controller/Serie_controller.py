@@ -24,4 +24,4 @@ async def delete(id: int, res: Response) -> None:
         res.status_code = status.HTTP_400_BAD_REQUEST
         return None
     
-    Serie_CRUD.deleteMateria(id)
+    await Serie_CRUD.deleteMateria(id)

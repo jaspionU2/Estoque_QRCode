@@ -5,7 +5,7 @@ from datetime import datetime
 import sqlalchemy
 
 from sqlalchemy import (String, func)
-from sqlalchemy.orm import (registry, Mapped, mapped_column)
+from sqlalchemy.orm import (Mapped, mapped_column)
 
 from configs.register import table_register
 @table_register.mapped_as_dataclass
