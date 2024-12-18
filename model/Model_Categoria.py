@@ -1,6 +1,6 @@
 from sqlalchemy import String
 
-from sqlalchemy.orm import (registry, Mapped, mapped_column)
+from sqlalchemy.orm import (Mapped, mapped_column)
 
 from configs.register import table_register
 @table_register.mapped_as_dataclass
@@ -9,8 +9,3 @@ class Categoria():
      
     id: Mapped[int] = mapped_column(init=False, primary_key=True, name='id_categoria')
     categoria: Mapped[str] = mapped_column(String(20), name='titulo_categoria', nullable=False)
-    
-    # chromebook
-    # ipad
-    # carregador
-
