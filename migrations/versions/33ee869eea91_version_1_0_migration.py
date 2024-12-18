@@ -1,8 +1,8 @@
-"""agora vaiiiiiiiiiiiiiiii porraa
+"""version 1.0 migration
 
-Revision ID: 2228d81ad771
+Revision ID: 33ee869eea91
 Revises: 
-Create Date: 2024-12-07 20:08:23.980288
+Create Date: 2024-12-17 21:42:49.483645
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2228d81ad771'
+revision: str = '33ee869eea91'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -41,8 +41,13 @@ def upgrade() -> None:
     op.create_table('professor',
     sa.Column('id_professor', sa.Integer(), nullable=False),
     sa.Column('nome_professor', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('id_materia', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id_professor')
+    )
+    op.create_table('serie',
+    sa.Column('id_serie', sa.Integer(), nullable=False),
+    sa.Column('titulo_serie', sa.String(length=20), nullable=False),
+    sa.PrimaryKeyConstraint('id_serie')
     )
     op.create_table('status',
     sa.Column('id_status', sa.Integer(), nullable=False),
@@ -113,6 +118,7 @@ def downgrade() -> None:
     op.drop_table('equipamento')
     op.drop_table('carregador')
     op.drop_table('status')
+    op.drop_table('serie')
     op.drop_table('professor')
     op.drop_table('materia')
     op.drop_table('categoria')

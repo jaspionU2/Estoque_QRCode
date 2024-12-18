@@ -5,16 +5,13 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from dotenv import load_dotenv
-
 from configs.settings import Config
 
-from configs.register import metadata
+from configs.register import metadata, table_register
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-load_dotenv()
 config.set_main_option('sqlalchemy.url', Config().DB_URI)
 
 # Interpret the config file for Python logging.
@@ -26,19 +23,8 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [metadata
-    # Model_Aluno.metadata, 
-    # Model_Professor.metadata, 
-    # Model_Status.metadata, 
-    # Model_Carregador.metadata,
-    # Model_Categoria.metadata, 
-    # Model_Materia.metadata,
-    # Model_Professor_Materia.metadata, 
-    # Model_Equipamento.metadata, 
-    # Model_Usuario.metadata, 
-    # Model_Atribuicao_permanente.metadata, 
-    # Model_Emprestimo.metadata
-   ]
+from model import *
+target_metadata = table_register.metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")

@@ -8,4 +8,4 @@ class Serie():
     __tablename__ = 'serie'
      
     id: Mapped[int] = mapped_column(init=False, primary_key=True, name='id_serie')
-    categoria: Mapped[str] = mapped_column(String(20), name='titulo_serie', nullable=False)
+    Serie: Mapped[str] = mapped_column(String(20), name='titulo_serie', nullable=False)
