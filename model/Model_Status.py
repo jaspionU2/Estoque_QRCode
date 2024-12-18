@@ -1,6 +1,6 @@
 from sqlalchemy import String
 from sqlalchemy.orm import (registry, Mapped, mapped_column, relationship)
-from configs.register import table_register, metadata
+from configs.register import table_register
 
 @table_register.mapped_as_dataclass
 class Status():

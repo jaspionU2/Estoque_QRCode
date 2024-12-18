@@ -8,9 +8,9 @@ class Emprestimo():
     
     id: Mapped[int] = mapped_column(init=False, primary_key=True, name='id_emprestimo')
     motivo_emprestimo: Mapped[str] = mapped_column(String(200), nullable=False, name='motivo_emprestimo')
-    data_inicio: Mapped[datetime] = mapped_column(TIMESTAMP, name='data_inicio', nullable=False)
-    data_fim: Mapped[datetime] = mapped_column(TIMESTAMP, name='data_fim', nullable=False)
-    equipamento: Mapped[int] = mapped_column(ForeignKey('equipamento.id_equipamento'), name='id_equipamento')
-    nome_usuario: Mapped[str] = mapped_column(String(100), name='nome_usuario')
+    data_inicio_emprestimo: Mapped[datetime] = mapped_column(TIMESTAMP, name='data_inicio', nullable=False)
+    data_fim_emprestimo: Mapped[datetime] = mapped_column(TIMESTAMP, name='data_fim', nullable=False)
+    equipamento_emprestimo: Mapped[int] = mapped_column(ForeignKey('equipamento.id_equipamento'), name='id_equipamento')
+    nome_usuario_emprestimo: Mapped[str] = mapped_column(String(100), name='nome_usuario')
     
 metadata = table_register.metadata

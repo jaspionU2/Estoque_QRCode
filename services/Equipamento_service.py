@@ -4,24 +4,17 @@ from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_Equipamento import Equipamento
 from model.Model_Carregador import Carregador
+
 engine = create_engine(Config().DB_URI)
 
 class Equipmanento_CRUD:
     
     async def getAllEquipamentos():
         try:
-            #with engine.connect() as conn:
-            #    result = conn.execute(select('*').select_from(text('getallequipamentos'))).all()
-            #    res = []
-            #    for row in result:
-            #        equi = Equipamento(numero_serie=row[1], matricula=row[2], categoria=row[3], status=row[4])
-            #        res.append(equi)
-            #    return res
             with Session(engine) as session:
                 query = select('*').select_from(text('getallequipamentos'))
                 result = session.execute(query).all()
                 res = []
-                obj = {}
                 for row in result:
                     equi = Equipamento(
                             numero_serie_equipamento=row[1],
@@ -33,8 +26,6 @@ class Equipmanento_CRUD:
                         ).__dict__
                     equi.pop("id_categoria_equipamento")
                     equi.pop("id_status_equipamento")
-                    #equi.id_equipamento = row[0]
-                    obj.update(equi)
                     
                     carregador = Carregador(
                             matricula_carregador=row[5],
@@ -42,21 +33,16 @@ class Equipmanento_CRUD:
                             status_carregador=row[6]
                         ).__dict__
                     carregador.pop("id_status_carregador")
-                    obj.update(dict.fromkeys(["carregador"], carregador))
+                    equi.update(dict.fromkeys(["carregador"], carregador))
 
-                    res.append(obj)
+                    res.append(equi)
+                print(res)
                 return res
-                
-                #for row in result:
-                #    print(row)
-                #return session.execute(select(Equipamento)).scalars().all()
         except SQLAlchemyError as err:
-            #session.rollback()
             print(err._message())
             print(err._sql_message())
             return None
         except Exception as err:
-            #session.rollback()
             print("Erro inesperado: " + str(err))
             return None
     async def createEquipamento(new_equipamento: list[Equipamento]):

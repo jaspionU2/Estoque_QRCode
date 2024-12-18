@@ -10,8 +10,5 @@ class Equipamento():
     matricula_equipamento: Mapped[str] = mapped_column(String(5), nullable=False, name='matricula_equipamento')
     id_categoria_equipamento: Mapped[int] = mapped_column(ForeignKey('categoria.id_categoria'), name='id_categoria')
     id_status_equipamento: Mapped[int] = mapped_column(ForeignKey('status.id_status'), name='id_status')
-    
-    categoria_equipamento: str
-    status_equipamento: str
 
 metadata = table_register.metadata

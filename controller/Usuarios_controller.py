@@ -22,22 +22,25 @@ async def create_professor(new_professor: dict, res: Response) -> dict:
     if not new_professor or new_professor is {}: 
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return {
+            "status": res.status_code,
             "message": "Ausencia de dados",
             "created": False
         }
         
     success = await Professor_CRUD.createProfessor(new_professor)
     
-    if success:
-        res.status_code = status.HTTP_201_CREATED
+    if not success:
+        res.status_code = status.HTTP_400_BAD_REQUEST
         return {
-            "created": True
+            "status": res.status_code,
+            "message": "Erro no processamento",
+            "created": False
         }
         
-    res.status_code = status.HTTP_400_BAD_REQUEST
+    res.status_code = status.HTTP_201_CREATED
     return {
-        "message": "Erro no processamento",
-        "created": False
+        "status": res.status_code,
+        "created": True
     }
 
 @router_usuario.put('/updateProfessor/{id}') 
@@ -45,6 +48,7 @@ async def update_Professor(id: int, new_values: dict, res: Response) -> dict:
     if not new_values:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return {
+            "status": res.status_code,
             "message": "Ausencia de dados",
             "updated": False
         }
@@ -53,10 +57,13 @@ async def update_Professor(id: int, new_values: dict, res: Response) -> dict:
     if not result:
         res.status_code = status.HTTP_409_CONFLICT
         return {
+            "status": res.status_code,
             "message": "Erro ao atualizar os dados solicitados",
             "updated": False
         }
+        
     res.status_code = status.HTTP_200_OK
+    return {}
 
 @router_usuario.delete('/deleteProfessor/{id}')
 async def delete(id: int, res: Response) -> None:
@@ -74,34 +81,80 @@ async def get_alunos(res: Response) -> list:
     return Alunos
 
 @router_usuario.post('/createAluno')
-async def create_aluno(new_aluno: list[Aluno], res: Response) -> None:
-    if not new_aluno :
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create_aluno(new_aluno: list[Aluno], res: Response) -> dict:
+    if not new_aluno or new_aluno is {}:
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return {
+            "status": res.status_code,
+            "message": "Ausencia de dados",
+            "created": False
+        }
     
-    sucess = await Aluno_CRUD.createAluno(new_aluno)
+    success = await Aluno_CRUD.createAluno(new_aluno)
     
-    if sucess:
-        res.status_code = status.HTTP_201_CREATED
-        return
-    else:
+    if not success:
         res.status_code = status.HTTP_400_BAD_REQUEST
-        return
+        return {
+            "status": res.status_code,
+            "message": "Erro no processamento",
+            "created": False
+        }
+        
+    res.status_code = status.HTTP_201_CREATED
+    return {
+        "status": res.status_code,
+        "created": True
+    }
+
 
 @router_usuario.put('/updateAluno/{id}') 
-async def update_aluno(id: int, new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def update_aluno(id: int, new_values: Aluno, res: Response) -> dict:
+    if not new_values:
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return {
+            "status": res.status_code,
+            "message": "Ausencia de dados",
+            "updated": False
+        }
     
-    await Aluno_CRUD.updateAluno(id, new_values)
+    result = await Aluno_CRUD.updateAluno(id, new_values)
+    
+    if not result:
+        res.status_code = status.HTTP_409_CONFLICT
+        return {
+            "status": res.status_code,
+            "message": "Erro ao atualizar os dados solicitados",
+            "updated": False
+        }
+        
     res.status_code = status.HTTP_200_OK
+    return {
+        "status": res.status_code,
+        "updated": True
+    }
 
 @router_usuario.delete('/deleteAluno/{id}')
-async def delete(id: int, res: Response) -> None:
+async def delete(id: int, res: Response) -> dict:
     if id <= 0 or id == None:
         res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+        return {
+            "status": res.status_code,
+            "message": "Ausencia de dados",
+            "deleted": False
+        }
     
-    await Aluno_CRUD.deleteAluno(id)
+    deleted = await Aluno_CRUD.deleteAluno(id)
+    
+    if not deleted:
+        res.status_code = status.HTTP_409_CONFLICT
+        return {
+            "status": res.status_code,
+            "message": "Erro ao deletar a entidade",
+            "deleted": False
+        }
+        
     res.status_code = status.HTTP_200_OK
+    return {
+        "status": res.status_code,
+        "deleted": True
+    }
