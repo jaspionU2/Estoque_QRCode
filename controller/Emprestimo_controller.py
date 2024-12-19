@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Response, status  
 from services.Emprestimo_service import Emprestimo_CRUD
 from model.Model_Emprestimo import Emprestimo
+
 from configs.statusMessage import messages
 
 router_emprestimo = APIRouter()  
@@ -46,50 +47,28 @@ async def create(new_emprestimo: list[Emprestimo], res: Response) -> dict:
 async def update(id: int, new_values: dict, res: Response) -> dict:
     if not new_values:
         res.status_code = status.HTTP_401_UNAUTHORIZED
-        return {
-            "status": res.status_code,
-            "message": "Ausencia de dados",
-            "updated": False
-        }
+        return messages["not_data"]
     
     result = await Emprestimo_CRUD.updateEmprestimo(id, new_values)
     
     if not result:
         res.status_code = status.HTTP_409_CONFLICT
-        return {
-            "status": res.status_code,
-            "message": "Erro ao atualizar os dados solicitados",
-            "updated": False
-        }
+        return messages["not_sucess"]
         
     res.status_code = status.HTTP_200_OK
-    return {
-        "status": res.status_code,
-        "updated": True
-    }
+    return messages["sucess"]
     
 @router_emprestimo.delete('/deleteEmprestimo/{id}')
 async def delete(id: int, res: Response) -> dict:
     if id <= 0 or id == None:
         res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return {
-            "status": res.status_code,
-            "message": "Ausencia de dados",
-            "deleted": False
-        }
+        return messages["not_data"]
     
     deleted = await Emprestimo_CRUD.deleteEmprestimo(id)
     
     if not deleted:
         res.status_code = status.HTTP_409_CONFLICT
-        return {
-            "status": res.status_code,
-            "message": "Erro ao deletar a entidade",
-            "deleted": False
-        }
+        return messages["not_sucess"]
         
     res.status_code = status.HTTP_200_OK
-    return {
-        "status": res.status_code,
-        "deleted": True
-    }
+    return messages["sucess"]
