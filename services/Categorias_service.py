@@ -14,14 +14,12 @@ class Categoria_CRUD:
             with Session(engine) as session:
                 return session.execute(select(Categoria)).scalars().all()
         except SQLAlchemyError as err:
-            session.rollback()
             print(err._message())
             print(err._sql_message())
             return None
         except Exception as err:
-            session.rollback()
             print("Erro inesperado: {err}")
-            return False
+            return None
 
     async def createCategoria(new_categoria: list[dict]):
         try:

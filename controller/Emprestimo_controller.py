@@ -52,7 +52,7 @@ async def update(id: int, new_values: dict, res: Response) -> dict:
     result = await Emprestimo_CRUD.updateEmprestimo(id, new_values)
     
     if not result:
-        res.status_code = status.HTTP_409_CONFLICT
+        res.status_code = status.HTTP_400_BAD_REQUEST
         return messages["not_sucess"]
         
     res.status_code = status.HTTP_200_OK
@@ -61,13 +61,13 @@ async def update(id: int, new_values: dict, res: Response) -> dict:
 @router_emprestimo.delete('/deleteEmprestimo/{id}')
 async def delete(id: int, res: Response) -> dict:
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
+        res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
     
     deleted = await Emprestimo_CRUD.deleteEmprestimo(id)
     
     if not deleted:
-        res.status_code = status.HTTP_409_CONFLICT
+        res.status_code = status.HTTP_400_BAD_REQUEST
         return messages["not_sucess"]
         
     res.status_code = status.HTTP_200_OK

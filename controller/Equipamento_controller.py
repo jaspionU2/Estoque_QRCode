@@ -41,14 +41,23 @@ async def update(id: int, new_values: Equipamento, res: Response) -> dict:
     result = await Equipmanento_CRUD.updateEquipamento(id, new_values)
     
     if not result:
-        res.status_code = status.HTTP_409_CONFLICT
+        res.status_code = status.HTTP_400_BAD_REQUEST
         return messages["not_sucess"]
     
-@router_equipamentos.delete("/deleteEquipamento/{id}")
-async def delete(id: int, res: Response):
-    if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+    res.status_code  = status.HTTP_200_OK
+    return messages["sucess"]
     
-    await Equipmanento_CRUD.deleteEquipamento(id) 
+@router_equipamentos.delete("/deleteEquipamento/{id}")
+async def delete(id: int, res: Response) -> dict:
+    if id <= 0 or id == None:
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return messages["not_data"]
+    
+    result = await Equipmanento_CRUD.deleteEquipamento(id) 
+    
+    if not result:
+        res.status_code = status.HTTP_400_BAD_REQUEST
+        return messages["not_sucess"]
+    
     res.status_code = status.HTTP_200_OK
+    return messages["sucess"]
