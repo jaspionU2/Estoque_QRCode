@@ -14,29 +14,29 @@ class Equipmanento_CRUD:
             with Session(engine) as session:
                 query = select('*').select_from(text('getallequipamentos'))
                 result = session.execute(query).all()
+                
                 res = []
                 for row in result:
                     equi = Equipamento(
-                            numero_serie_equipamento=row[1],
-                            matricula_equipamento=row[2],
+                            numero_serie_equipamento=row[0],
+                            matricula_equipamento=row[1],
                             id_categoria_equipamento=0,
-                            id_status_equipamento=0,
-                            categoria_equipamento=row[3],
-                            status_equipamento=row[4]
+                            id_status_equipamento=0
                         ).__dict__
+                    equi.update(dict.fromkeys(["categoria_equipamento"], row[2]))
+                    equi.update(dict.fromkeys(["status_equipamento"], row[3]))
                     equi.pop("id_categoria_equipamento")
                     equi.pop("id_status_equipamento")
                     
                     carregador = Carregador(
-                            matricula_carregador=row[5],
-                            id_status_carregador=0,
-                            status_carregador=row[6]
+                            matricula_carregador=row[4],
+                            id_status_carregador=0
                         ).__dict__
+                    carregador.update(dict.fromkeys(["status_carregador"], row[5]))
                     carregador.pop("id_status_carregador")
                     equi.update(dict.fromkeys(["carregador"], carregador))
 
                     res.append(equi)
-                print(res)
                 return res
         except SQLAlchemyError as err:
             print(err._message())

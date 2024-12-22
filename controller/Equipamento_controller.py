@@ -10,7 +10,7 @@ router_equipamentos = APIRouter()
 async def get(res: Response):
     equipamentos = await Equipmanento_CRUD.getAllEquipamentos()
     
-    if equipamentos is None or equipamentos is []:
+    if not equipamentos:
         res.status_code = status.HTTP_404_NOT_FOUND
         return [messages["getErro"]]
     

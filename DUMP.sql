@@ -100,7 +100,7 @@ INNER JOIN carregador ON equi.id_carregador = carregador.id_carregador
 INNER JOIN status sts_carr ON sts_carr.id_status = carregador.id_status;
 
 CREATE OR REPLACE VIEW getallatribuicoesfromaluno AS
-SELECT id_atribuicao_permanente, aluno.id_aluno, nome_aluno, serie_aluno, turma_aluno
+SELECT id_atribuicao_permanente, aluno.id_aluno, nome_aluno, serie_aluno, turma_aluno,
 id_equipamento, numero_de_serie_equipamento, matricula_equipamento, titulo_categoria as categoria, 
 sts_equi.titulo_status as status_equipamento, matricula_carregador, sts_carr.titulo_status as status_carregador
 FROM atribuicao_permanente ap 

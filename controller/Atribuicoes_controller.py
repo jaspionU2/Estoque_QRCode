@@ -1,51 +1,79 @@
 from fastapi import APIRouter, Response, status  
 
-router_atribuicao = APIRouter()  
+from services.Atribuicoes_service import Atribuicao_CRUD
 
-@router_atribuicao.get('/getAllAtribuicoes')
-async def get(res: Response) -> list:
-    atribuicoes = [{}] #service.getAllAtribuicoesFromAluno
-    atribuicoes.append([{}]) #service.getAllAtribuicoesFromProfessor
-    res.status_code = status.HTTP_200_OK
-    return atribuicoes
+from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
+
+from configs.statusMessage import messages
+
+router_atribuicao = APIRouter()  
 
 @router_atribuicao.get('/getAllAtribuicoesFromAlunos')
 async def get(res: Response) -> list:
-    atribuicoes = [{}] #service.getAllAtribuicoesFromAluno
+    atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromAlunos()
+    
+    if not atribuicoes:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return [messages["getErro"]]
+    
     res.status_code = status.HTTP_200_OK
     return atribuicoes
 
 @router_atribuicao.get('/getAllAtribuicoesFromProfessores')
 async def get(res: Response) -> list:
-    atribuicoes = [{}] #service.getAllAtribuicoesFromProfessor
+    atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromProfessores()
+    print(atribuicoes)
+    
+    if not atribuicoes:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return [messages["getErro"]]
+    
     res.status_code = status.HTTP_200_OK
     return atribuicoes
 
 @router_atribuicao.post('/createNewAtribuicao')
 async def create(new_atribuicao: dict, res: Response) -> None:
-    if new_atribuicao == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+    if not new_atribuicao or new_atribuicao is {}: 
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return messages["not_data"]
     
-    # service.createAtribuicao(new_atribuicao)
+    sucess = Atribuicao_CRUD.createAtricuicao(new_atribuicao)
+    
+    if not sucess:
+        res.status_code = status.HTTP_400_BAD_REQUEST
+        return messages["not_sucess"]
+        
     res.status_code = status.HTTP_201_CREATED
+    return messages["sucess"]
 
 @router_atribuicao.put('/updateAtribuicao')
 async def update(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+    if not new_values:
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return messages["not_data"]
     
-    # service.updateAtribuicao(new_values)
+    result = Atribuicao_CRUD.updateAtribuicao(new_values["id"], new_values)
+    
+    if not result:
+        res.status_code = status.HTTP_400_BAD_REQUEST
+        return messages["not_sucess"]
+        
     res.status_code = status.HTTP_200_OK
+    return messages["sucess"]
     
 @router_atribuicao.delete('/deleteAtribuicao/{id}')
 async def delete(id: int, res: Response) -> None:
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return messages["not_data"]
     
-    # sevice.deleteAtribuicao(id)
+    
+    deleted = Atribuicao_CRUD.deleteAtribuicao(id)
+    if not deleted:
+        res.status_code = status.HTTP_400_BAD_REQUEST
+        return messages["not_sucess"]
+        
     res.status_code = status.HTTP_200_OK
+    return messages["sucess"]
     
     
