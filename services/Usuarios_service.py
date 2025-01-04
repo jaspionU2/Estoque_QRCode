@@ -12,7 +12,7 @@ engine = create_engine(Config().DB_URI)
 
 class Aluno_CRUD():
 
-    async def getAllAlunos() -> list[Aluno]:
+    async def getAllAlunos() -> list:
         try:
             with Session(engine) as session:   
                 return session.execute(select(Aluno)).scalars().all()
@@ -101,8 +101,7 @@ class Professor_CRUD:
     async def getAllProfessores() -> list[Professor]:
         try:
             with Session(engine) as session:
-                select(Professor).inn
-                return session.execute(select(Professor).join(Materia, Professor.id_materia == Materia.id)).all()
+                return session.execute(select(Professor)).all()
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status
 from services.Usuarios_service import Aluno_CRUD, Professor_CRUD
 from model.Model_Aluno import Aluno
 from model.Model_Professor import Professor
@@ -8,10 +8,10 @@ from configs.statusMessage import messages
 router_usuario = APIRouter()  
 
 @router_usuario.get('/getAllProfessores')
-async def get_Professores(res: Response) -> list[Professor]:
+async def get_Professores(res: Response) -> list[dict]:
     professores = await Professor_CRUD.getAllProfessores()
 
-    if professores is None or professores is []:
+    if professores is None:
         res.status_code = status.HTTP_404_NOT_FOUND
         return [messages["getErro"]]
     
@@ -64,7 +64,7 @@ async def delete_Professor(id: int, res: Response) -> dict:
     return messages["sucess"]
 
 @router_usuario.get('/getAllAlunos')
-async def get_alunos(res: Response) -> list[Aluno]:
+async def get_alunos(res: Response) -> list:
     alunos = await Aluno_CRUD.getAllAlunos() 
     
     if alunos is None or alunos is []:

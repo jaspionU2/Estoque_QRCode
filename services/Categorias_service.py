@@ -32,7 +32,7 @@ class Categoria_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
             print("Erro inesperado: {err}")
