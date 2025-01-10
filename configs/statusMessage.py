@@ -11,6 +11,10 @@ messages = {
         "status": 400,
         "message": "Erro no processamento"
     },
+    "not_found": {
+        "status": 404,
+        "message": "Dados não encontrados"
+    },
     "sucess": {
         "status": 201
     }

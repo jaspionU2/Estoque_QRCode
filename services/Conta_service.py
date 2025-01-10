@@ -10,6 +10,20 @@ from model.Model_Conta import Conta
 engine = create_engine(Config().DB_URI)
 
 class Conta_CRUD:
+    
+    async def doLogin(email: str, senha: str):
+        try:
+            with Session(engine) as session:
+                conta = session.execute(select(Conta).where(Conta.email_conta == email, Conta.senha_conta == senha)).scalars().all()
+                
+                return conta
+        except SQLAlchemyError as err:
+            print(err._message())
+            return None
+        except Exception as err:
+            print("Erro inesperado: {err}")
+            return None
+        
     async def getAllConta():
         try:
             with Session(engine) as session:

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Request
 from services.Conta_service import Conta_CRUD
 
 from configs.statusMessage import messages
@@ -7,6 +7,18 @@ from configs.security import verify_password
 from model.Model_Conta import Conta
 
 router_conta = APIRouter()  
+
+
+
+@router_conta.post("/doLogin")
+async def login(req: Request, res: Response):
+    login = await Conta_CRUD.doLogin("yuri1234@gmail.com", "yuri1234")
+    
+    if login == []:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return messages["not_found"]
+    
+    return login[0]
 
 @router_conta.get("/getAllContas")
 async def get(res: Response) -> list[Conta]:
