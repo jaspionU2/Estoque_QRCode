@@ -1,15 +1,20 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends
 
 from services.Atribuicoes_service import Atribuicao_CRUD
 
 from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
+
+from configs.security import get_current_user
 
 from configs.statusMessage import messages
 
 router_atribuicao = APIRouter()  
 
 @router_atribuicao.get('/getAllAtribuicoesFromAlunos')
-async def get(res: Response) -> list:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
     atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromAlunos()
     
     if not atribuicoes:
@@ -20,7 +25,10 @@ async def get(res: Response) -> list:
     return atribuicoes
 
 @router_atribuicao.get('/getAllAtribuicoesFromProfessores')
-async def get(res: Response) -> list:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
     atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromProfessores()
     print(atribuicoes)
     
@@ -32,7 +40,11 @@ async def get(res: Response) -> list:
     return atribuicoes
 
 @router_atribuicao.post('/createNewAtribuicao')
-async def create(new_atribuicao: dict, res: Response) -> None:
+async def create(
+    new_atribuicao: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
     if not new_atribuicao or new_atribuicao is {}: 
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -47,7 +59,11 @@ async def create(new_atribuicao: dict, res: Response) -> None:
     return messages["sucess"]
 
 @router_atribuicao.put('/updateAtribuicao')
-async def update(new_values: dict, res: Response) -> None:
+async def update(
+    new_values: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
     if not new_values:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -62,7 +78,11 @@ async def update(new_values: dict, res: Response) -> None:
     return messages["sucess"]
     
 @router_atribuicao.delete('/deleteAtribuicao/{id}')
-async def delete(id: int, res: Response) -> None:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
     if id <= 0 or id == None:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]

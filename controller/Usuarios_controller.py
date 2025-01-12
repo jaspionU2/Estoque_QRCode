@@ -1,14 +1,20 @@
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response, status, Depends
+
 from services.Usuarios_service import Aluno_CRUD, Professor_CRUD
+
 from model.Model_Aluno import Aluno
 from model.Model_Professor import Professor
 
 from configs.statusMessage import messages
+from configs.security import get_current_user
 
 router_usuario = APIRouter()  
 
 @router_usuario.get('/getAllProfessores')
-async def get_Professores(res: Response) -> list[dict]:
+async def get_Professores(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list[dict]:
     professores = await Professor_CRUD.getAllProfessores()
 
     if professores is None:
@@ -19,7 +25,11 @@ async def get_Professores(res: Response) -> list[dict]:
     return professores
 
 @router_usuario.post('/createProfessor')
-async def create_professor(new_professor: list[Professor], res: Response) -> dict:
+async def create_professor(
+    new_professor: list[Professor],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if not new_professor or new_professor is []: 
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -34,7 +44,12 @@ async def create_professor(new_professor: list[Professor], res: Response) -> dic
     return messages["sucess"]
 
 @router_usuario.put('/updateProfessor/{id}') 
-async def update_Professor(id: int, new_values: dict, res: Response) -> dict:
+async def update_Professor(
+    id: int,
+    new_values: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if not new_values:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -49,7 +64,11 @@ async def update_Professor(id: int, new_values: dict, res: Response) -> dict:
     return messages["sucess"]
 
 @router_usuario.delete('/deleteProfessor/{id}')
-async def delete_Professor(id: int, res: Response) -> dict:
+async def delete_Professor(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if id <= 0 or id is None:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -64,7 +83,10 @@ async def delete_Professor(id: int, res: Response) -> dict:
     return messages["sucess"]
 
 @router_usuario.get('/getAllAlunos')
-async def get_alunos(res: Response) -> list:
+async def get_alunos(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
     alunos = await Aluno_CRUD.getAllAlunos() 
     
     if alunos is None or alunos is []:
@@ -75,7 +97,11 @@ async def get_alunos(res: Response) -> list:
     return alunos
 
 @router_usuario.post('/createAluno')
-async def create_aluno(new_aluno: list[Aluno], res: Response) -> dict:
+async def create_aluno(
+    new_aluno: list[Aluno],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if not new_aluno or new_aluno is []:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -91,7 +117,12 @@ async def create_aluno(new_aluno: list[Aluno], res: Response) -> dict:
 
 
 @router_usuario.put('/updateAluno/{id}') 
-async def update_aluno(id: int, new_values: Aluno, res: Response) -> dict:
+async def update_aluno(
+    id: int,
+    new_values: Aluno,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if not new_values:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -106,7 +137,11 @@ async def update_aluno(id: int, new_values: Aluno, res: Response) -> dict:
     return messages["sucess"]
 
 @router_usuario.delete('/deleteAluno/{id}')
-async def delete(id: int, res: Response) -> dict:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if id <= 0 or id is None:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]

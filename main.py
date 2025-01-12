@@ -9,9 +9,11 @@ from controller.Serie_controller import router_serie
 from controller.Status_controller import router_status_dispositivo
 from controller.Categoria_controller import router_categoria
 from controller.Conta_controller import router_conta
+from controller.Token_controller import router_token
 
 app = FastAPI()
 
+app.router.include_router(router_token, prefix="/token")
 app.router.include_router(router_conta, prefix="/conta")
 app.router.include_router(router_equipamentos, prefix="/equipamento")
 app.router.include_router(router_atribuicao, prefix="/atribuicao")

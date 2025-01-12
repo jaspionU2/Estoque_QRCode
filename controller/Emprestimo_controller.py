@@ -1,13 +1,17 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends 
 from services.Emprestimo_service import Emprestimo_CRUD
 from model.Model_Emprestimo import Emprestimo
 
 from configs.statusMessage import messages
+from configs.security import get_current_user
 
 router_emprestimo = APIRouter()  
 
 @router_emprestimo.get('/getAllEmprestimosFromAlunos')
-async def get(res: Response) -> list[dict]:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list[dict]:
     emprestimos = await Emprestimo_CRUD.getAllEmprestimosFromAlunos()
     
     if emprestimos is None or emprestimos is []:
@@ -18,7 +22,10 @@ async def get(res: Response) -> list[dict]:
     return emprestimos
 
 @router_emprestimo.get('/getAllEmprestimosFromProfessores')
-async def get(res: Response) -> list[dict]:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list[dict]:
     emprestimos = await Emprestimo_CRUD.getAllEmprestimosFromProfessores()
     
     if emprestimos is None or emprestimos is []:
@@ -29,7 +36,11 @@ async def get(res: Response) -> list[dict]:
     return emprestimos
 
 @router_emprestimo.post('/createNewEmprestimo')
-async def create(new_emprestimo: list[Emprestimo], res: Response) -> dict:
+async def create(
+    new_emprestimo: list[Emprestimo],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if not new_emprestimo or new_emprestimo is {}: 
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -44,7 +55,12 @@ async def create(new_emprestimo: list[Emprestimo], res: Response) -> dict:
     return messages["sucess"]
 
 @router_emprestimo.put('/updateEmprestimo')
-async def update(id: int, new_values: dict, res: Response) -> dict:
+async def update(
+    id: int,
+    new_values: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if not new_values:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -59,7 +75,11 @@ async def update(id: int, new_values: dict, res: Response) -> dict:
     return messages["sucess"]
     
 @router_emprestimo.delete('/deleteEmprestimo/{id}')
-async def delete(id: int, res: Response) -> dict:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if id <= 0 or id == None:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]

@@ -16,7 +16,9 @@ class Conta_CRUD:
             with Session(engine) as session:
                 conta = session.execute(select(Conta).where(Conta.email_conta == email, Conta.senha_conta == senha)).scalars().all()
                 
-                return conta
+                if conta is []: return None
+                
+                return conta[0]
         except SQLAlchemyError as err:
             print(err._message())
             return None
@@ -35,6 +37,25 @@ class Conta_CRUD:
             return None
         except Exception as err:
             print("Erro inesperado: {err}")
+            return None
+        
+    async def getOneConta(email: str) -> Conta:
+        try:
+            with Session(engine) as session:
+                conta = session.execute(select(Conta).where(Conta.email_conta == email)).scalars().all()
+                
+                if conta is []:  return None
+
+                conta = conta[0].__dict__
+                
+                conta.pop("_sa_instance_state")
+                
+                return conta
+        except SQLAlchemyError as err:
+            print(err._message())
+            return None
+        except Exception as err:
+            print("Erro inesperado: " + str(err))
             return None
     
     async def createConta(new_conta: dict):
@@ -67,6 +88,8 @@ class Conta_CRUD:
                                         where(Conta.id_conta == Id).
                                         values(new_value))
                 session.commit()
+                
+                print(new_value)
                 
                 return result.rowcount > 0
         except SQLAlchemyError as err:

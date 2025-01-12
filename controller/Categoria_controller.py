@@ -1,14 +1,18 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends 
 from services.Categorias_service import Categoria_CRUD
 
 from configs.statusMessage import messages
+from configs.security import get_current_user
 
 from model.Model_Categoria import Categoria
 
 router_categoria = APIRouter()  
 
 @router_categoria.get("/getAllCategorias")
-async def get(res: Response) -> list[dict]:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list[dict]:
     categorias = await Categoria_CRUD.getAllCategorias()
     if categorias is None or categorias is []:
         res.status_code = status.HTTP_404_NOT_FOUND
@@ -18,7 +22,11 @@ async def get(res: Response) -> list[dict]:
     return categorias
 
 @router_categoria.post("/addNewCategoria")
-async def create(new_categoria: list[Categoria], res: Response) -> dict:
+async def create(
+    new_categoria: list[Categoria],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if new_categoria is None or new_categoria is list[None]:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -34,7 +42,11 @@ async def create(new_categoria: list[Categoria], res: Response) -> dict:
     return messages["sucess"]
 
 @router_categoria.delete("/deleteOneCategoria{id}")
-async def delete(id: int, res: Response) -> dict:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if id is None or id < 1:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]

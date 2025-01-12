@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends  
 from services.Status_service import Status_CRUD
 
 from configs.statusMessage import messages
+from configs.security import get_current_user
 
 router_status_dispositivo = APIRouter()  
 
 @router_status_dispositivo.get("/getAllStatus")
-async def get(res: Response) -> list:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
     status_dispositivo = await Status_CRUD.getAllStatus()
     
     if status_dispositivo is None or status_dispositivo is []:
@@ -17,7 +21,11 @@ async def get(res: Response) -> list:
     return status_dispositivo
 
 @router_status_dispositivo.post("/addNewStatus_dispositivo")
-async def create(new_status_dispositivo: list[dict], res: Response) -> dict:
+async def create(
+    new_status_dispositivo: list[dict],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if new_status_dispositivo is None or new_status_dispositivo is []:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -32,7 +40,11 @@ async def create(new_status_dispositivo: list[dict], res: Response) -> dict:
     return messages["sucess"]
 
 @router_status_dispositivo.delete("/deleteOneStatus_dispositivo/{id}")
-async def delete(id: int, res: Response) -> dict:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if id is None or id < 1:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]

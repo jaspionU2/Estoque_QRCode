@@ -1,24 +1,33 @@
-from fastapi import APIRouter, Response, status, Request
+from fastapi import APIRouter, Response, status, Depends, HTTPException
+
+from fastapi.security import OAuth2PasswordRequestForm
+
 from services.Conta_service import Conta_CRUD
 
 from configs.statusMessage import messages
-from configs.security import verify_password
+
+from configs.security import verify_password, getJWTToken
 
 from model.Model_Conta import Conta
 
 router_conta = APIRouter()  
 
-
-
 @router_conta.post("/doLogin")
-async def login(req: Request, res: Response):
-    login = await Conta_CRUD.doLogin("yuri1234@gmail.com", "yuri1234")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    conta = await Conta_CRUD.getOneConta(form_data.username)
     
-    if login == []:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return messages["not_found"]
+    if not conta or not verify_password(form_data.password, conta["senha_conta"]):
+        raise HTTPException (
+            status_code=400,
+            detail="Incorrect email or password"
+        )
     
-    return login[0]
+    token = getJWTToken(data={"sub": conta["email_conta"]})
+    
+    return {
+        "access_token": token,
+        "type_token": "Bearer"
+    }
 
 @router_conta.get("/getAllContas")
 async def get(res: Response) -> list[Conta]:

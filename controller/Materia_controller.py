@@ -1,13 +1,17 @@
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response, status, Depends
 from services.Materia_service import Materia_CRUD
 from model.Model_Materia import Materia  
 
 from configs.statusMessage import messages
+from configs.security import get_current_user
 
 router_materia = APIRouter()  
 
 @router_materia.get("/getAllMaterias")
-async def get(res: Response) -> list:
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
     materias = await Materia_CRUD.getAllMaterias()
     
     if materias is None or materias is []:
@@ -18,7 +22,11 @@ async def get(res: Response) -> list:
     return materias
 
 @router_materia.post("/addNewMateria")
-async def create(new_materia: list[Materia], res: Response) -> dict:
+async def create(
+    new_materia: list[Materia],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if new_materia is None or new_materia is []:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
@@ -33,7 +41,11 @@ async def create(new_materia: list[Materia], res: Response) -> dict:
     return messages["sucess"]
 
 @router_materia.delete("/deleteOneMateria/{id}")
-async def delete(id: int, res: Response) -> dict:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> dict:
     if id == None and id <= 0:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return messages["not_data"]
