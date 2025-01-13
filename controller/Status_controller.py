@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response, status, Depends  
 from services.Status_service import Status_CRUD
 
-from configs.statusMessage import messages
+from configs import statusMessage
 from configs.security import get_current_user
 
 router_status_dispositivo = APIRouter()  
@@ -14,8 +14,7 @@ async def get(
     status_dispositivo = await Status_CRUD.getAllStatus()
     
     if status_dispositivo is None or status_dispositivo is []:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return [messages["getErro"]]
+        raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
     return status_dispositivo
@@ -27,17 +26,14 @@ async def create(
     current_user = Depends(get_current_user)
 ) -> dict:
     if new_status_dispositivo is None or new_status_dispositivo is []:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     result = await Status_CRUD.createStatus(new_status_dispositivo)
     
     if not result:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
     
     res.status_code = status.HTTP_201_CREATED
-    return messages["sucess"]
 
 @router_status_dispositivo.delete("/deleteOneStatus_dispositivo/{id}")
 async def delete(
@@ -46,14 +42,11 @@ async def delete(
     current_user = Depends(get_current_user)
 ) -> dict:
     if id is None or id < 1:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     result = await Status_CRUD.deleteStatus(id)
     
     if not result:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
     
-    res.status_code = status.HTTP_200_OK
-    return messages["sucess"]
+    res.status_code = status.HTTP_202_ACCEPTED

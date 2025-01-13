@@ -29,14 +29,22 @@ class Conta_CRUD:
     async def getAllConta():
         try:
             with Session(engine) as session:
-                contas = session.execute(select(Conta)).scalars().all()
+                data = session.execute(select(Conta)).scalars().all()
+                listSize: int = int(data.__len__())
+                
+                contas = data
+                
+                print(data)
+                for i in range(0, listSize):
+                    print(i)
+                    #contas[i] = data[i].__dict__.pop("_sa_instance_state")
                 
                 return contas
         except SQLAlchemyError as err:
             print(err._message())
             return None
         except Exception as err:
-            print("Erro inesperado: {err}")
+            print("Erro inesperado: " + str(err))
             return None
         
     async def getOneConta(email: str) -> Conta:
@@ -58,38 +66,45 @@ class Conta_CRUD:
             print("Erro inesperado: " + str(err))
             return None
     
-    async def createConta(new_conta: dict):
+    async def createConta(new_conta: Conta):
         try:
             with Session(engine) as session:
-                new_conta["senha_conta"] = get_password_hash(new_conta["senha_conta"])
                 
-                session.execute(insert(Conta).values(new_conta))
+                conta = new_conta.__dict__
+                
+                new_conta = conta
+                
+                hashed_passwword = get_password_hash(new_conta["senha_conta"])
+                
+                new_conta["senha_conta"] = hashed_passwword
+                
+                result = session.execute(insert(Conta).values(new_conta))
                 
                 session.commit()
                 
-                return session.execute(select(Conta).where(Conta.email_conta == new_conta['email_conta'])).scalars().all()
+                return result.rowcount > 0
                 
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
             print("Erro inesperado: " + str(err))
-            return None
+            return False
         
     async def updateConta(Id: int, new_value: dict):
         try:
             with Session(engine) as session:
-                new_value["senha_conta"] = get_password_hash(new_value["senha_conta"]) if not new_value["senha_conta"] is "" else new_value["senha_conta"]
+                
+                if "senha_conta" in new_value:
+                    new_value["senha_conta"] = get_password_hash(new_value["senha_conta"]) 
                 
                 result = session.execute(update(Conta).
                                         where(Conta.id_conta == Id).
                                         values(new_value))
                 session.commit()
-                
-                print(new_value)
                 
                 return result.rowcount > 0
         except SQLAlchemyError as err:
@@ -106,7 +121,7 @@ class Conta_CRUD:
         try:
             with Session(engine) as session:
                 result = session.execute(delete(Conta).
-                                        where(Conta.id == Id))
+                                        where(Conta.id_conta == Id))
                 session.commit()
                 
                 return result.rowcount > 0

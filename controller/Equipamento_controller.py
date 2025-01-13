@@ -4,7 +4,7 @@ from model.Model_Equipamento import Equipamento
 
 from configs.security import get_current_user
 
-from configs.statusMessage import messages
+from configs import statusMessage
 
 router_equipamentos = APIRouter()  
 
@@ -16,8 +16,7 @@ async def get(
     equipamentos = await Equipmanento_CRUD.getAllEquipamentos()
     
     if not equipamentos:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return [messages["getErro"]]
+        raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
     return equipamentos
@@ -30,17 +29,14 @@ async def create(
     current_user = Depends(get_current_user)
 ):
     if new_equipmanento is None or new_equipmanento is []:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
 
     sucess = await Equipmanento_CRUD.createEquipamento(new_equipmanento)
     
     if not sucess:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_201_CREATED
-    return messages["sucess"]
     
 @router_equipamentos.put("/updateEquipamento/{id}")
 async def update(
@@ -50,17 +46,14 @@ async def update(
     current_user = Depends(get_current_user)
 ) -> dict:
     if not new_values:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     result = await Equipmanento_CRUD.updateEquipamento(id, new_values)
     
     if not result:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
     
-    res.status_code  = status.HTTP_200_OK
-    return messages["sucess"]
+    res.status_code  = status.HTTP_202_ACCEPTED
     
 @router_equipamentos.delete("/deleteEquipamento/{id}")
 async def delete(
@@ -69,14 +62,11 @@ async def delete(
     current_user = Depends(get_current_user)
 ) -> dict:
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     result = await Equipmanento_CRUD.deleteEquipamento(id) 
     
     if not result:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
     
-    res.status_code = status.HTTP_200_OK
-    return messages["sucess"]
+    res.status_code = status.HTTP_202_ACCEPTED

@@ -6,7 +6,7 @@ from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuica
 
 from configs.security import get_current_user
 
-from configs.statusMessage import messages
+from configs import statusMessage
 
 router_atribuicao = APIRouter()  
 
@@ -18,8 +18,7 @@ async def get(
     atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromAlunos()
     
     if not atribuicoes:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return [messages["getErro"]]
+        raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
     return atribuicoes
@@ -33,8 +32,7 @@ async def get(
     print(atribuicoes)
     
     if not atribuicoes:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return [messages["getErro"]]
+        raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
     return atribuicoes
@@ -46,17 +44,14 @@ async def create(
     current_user = Depends(get_current_user)
 ) -> None:
     if not new_atribuicao or new_atribuicao is {}: 
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     sucess = Atribuicao_CRUD.createAtricuicao(new_atribuicao)
     
     if not sucess:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_201_CREATED
-    return messages["sucess"]
 
 @router_atribuicao.put('/updateAtribuicao')
 async def update(
@@ -65,17 +60,14 @@ async def update(
     current_user = Depends(get_current_user)
 ) -> None:
     if not new_values:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     result = Atribuicao_CRUD.updateAtribuicao(new_values["id"], new_values)
     
     if not result:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
         
-    res.status_code = status.HTTP_200_OK
-    return messages["sucess"]
+    res.status_code = status.HTTP_202_ACCEPTED
     
 @router_atribuicao.delete('/deleteAtribuicao/{id}')
 async def delete(
@@ -83,17 +75,14 @@ async def delete(
     res: Response,
     current_user = Depends(get_current_user)
 ) -> None:
+    
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_401_UNAUTHORIZED
-        return messages["not_data"]
+        raise statusMessage.NOT_DATA
     
     
     deleted = Atribuicao_CRUD.deleteAtribuicao(id)
+    
     if not deleted:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return messages["not_sucess"]
+        raise statusMessage.NOT_SUCCESS
         
-    res.status_code = status.HTTP_200_OK
-    return messages["sucess"]
-    
-    
+    res.status_code = status.HTTP_202_ACCEPTED

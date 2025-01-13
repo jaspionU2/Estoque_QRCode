@@ -7,7 +7,7 @@ from alembic import context
 
 from configs.settings import Config
 
-from configs.register import metadata, table_register
+from configs.register import table_register
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
