@@ -29,15 +29,7 @@ class Conta_CRUD:
     async def getAllConta():
         try:
             with Session(engine) as session:
-                data = session.execute(select(Conta)).scalars().all()
-                listSize: int = int(data.__len__())
-                
-                contas = data
-                
-                print(data)
-                for i in range(0, listSize):
-                    print(i)
-                    #contas[i] = data[i].__dict__.pop("_sa_instance_state")
+                contas = session.execute(select(Conta)).scalars().all()
                 
                 return contas
         except SQLAlchemyError as err:
