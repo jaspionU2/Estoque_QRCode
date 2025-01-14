@@ -23,7 +23,7 @@ pwd_context = PasswordHash.recommended()
 
 SECRET_KEY = "segredo"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRES = 30
+ACCESS_TOKEN_EXPIRES = 60
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="conta/doLogin")
 

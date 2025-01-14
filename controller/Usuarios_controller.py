@@ -87,10 +87,10 @@ async def get_alunos(
 
 @router_usuario.post('/createAluno')
 async def create_aluno(
-    new_aluno: list[Aluno],
+    new_aluno: Aluno,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if not new_aluno or new_aluno is []:
         raise statusMessage.NOT_DATA
     
