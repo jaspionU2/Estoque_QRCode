@@ -9,7 +9,7 @@ engine = create_engine(Config().DB_URI)
 
 class Categoria_CRUD:
 
-    async def getAllCategorias():
+    async def getAllCategorias() -> list:
         try:
             with Session(engine) as session:
                 return session.execute(select(Categoria)).scalars().all()

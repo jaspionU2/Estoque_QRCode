@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response, status, Depends
-from services.Materia_service import Materia_CRUD
+from service.Materia_service import Materia_CRUD
 from model.Model_Materia import Materia  
 
 from configs import statusMessage
@@ -25,7 +25,7 @@ async def create(
     new_materia: list[Materia],
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if new_materia is None or new_materia is []:
         raise statusMessage.NOT_DATA
     
@@ -41,7 +41,7 @@ async def delete(
     id: int,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if id == None and id <= 0:
         raise statusMessage.NOT_DATA
     

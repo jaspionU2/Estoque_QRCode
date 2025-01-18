@@ -13,4 +13,4 @@ class Emprestimo():
     equipamento_emprestimo: Mapped[int] = mapped_column(ForeignKey('equipamento.id_equipamento'), name='id_equipamento')
     nome_usuario_emprestimo: Mapped[str] = mapped_column(String(100), name='nome_usuario')
     
-metadata = table_register.metadata
+

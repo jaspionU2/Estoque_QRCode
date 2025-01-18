@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response, status, Depends 
-from services.Emprestimo_service import Emprestimo_CRUD
+from service.Emprestimo_service import Emprestimo_CRUD
 from model.Model_Emprestimo import Emprestimo
 
 from configs import statusMessage
@@ -11,7 +11,7 @@ router_emprestimo = APIRouter()
 async def get(
     res: Response,
     current_user = Depends(get_current_user)
-) -> list[dict]:
+) -> list:
     emprestimos = await Emprestimo_CRUD.getAllEmprestimosFromAlunos()
     
     if emprestimos is None or emprestimos is []:
@@ -24,7 +24,7 @@ async def get(
 async def get(
     res: Response,
     current_user = Depends(get_current_user)
-) -> list[dict]:
+) -> list:
     emprestimos = await Emprestimo_CRUD.getAllEmprestimosFromProfessores()
     
     if emprestimos is None or emprestimos is []:
@@ -55,7 +55,7 @@ async def update(
     new_values: dict,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if not new_values:
         raise statusMessage.NOT_DATA
     
@@ -71,7 +71,7 @@ async def delete(
     id: int,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if id <= 0 or id == None:
         raise statusMessage.NOT_DATA
     

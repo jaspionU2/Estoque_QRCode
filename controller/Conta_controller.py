@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, Depends, HTTPException, status
 
 from fastapi.security import OAuth2PasswordRequestForm
 
-from services.Conta_service import Conta_CRUD
+from service.Conta_service import Conta_CRUD
 
 from configs import statusMessage
 
@@ -49,7 +49,7 @@ async def get(
 async def create(
     new_conta: Conta,
     res: Response
-) -> dict:
+) -> None:
     if not new_conta:
         raise statusMessage.NOT_DATA
     

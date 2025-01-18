@@ -9,4 +9,3 @@ class Materia():
     id: Mapped[int] = mapped_column(name='id_materia', init=False, primary_key=True)
     materia: Mapped[str] = mapped_column(String(50), name='titulo_materia', nullable=False)
         
-metadata = table_register.metadata
