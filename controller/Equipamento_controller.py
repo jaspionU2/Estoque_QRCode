@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response, status, Depends
-from services.Equipamento_service import Equipmanento_CRUD
+from service.Equipamento_service import Equipmanento_CRUD
 from model.Model_Equipamento import Equipamento
 
 from configs.security import get_current_user
@@ -12,7 +12,7 @@ router_equipamentos = APIRouter()
 async def get(
     res: Response,
     current_user = Depends(get_current_user)
-):
+) -> list:
     equipamentos = await Equipmanento_CRUD.getAllEquipamentos()
     
     if not equipamentos:
@@ -27,7 +27,7 @@ async def create(
     new_equipmanento: list[Equipamento],
     res: Response,
     current_user = Depends(get_current_user)
-):
+) -> None:
     if new_equipmanento is None or new_equipmanento is []:
         raise statusMessage.NOT_DATA
 
@@ -44,7 +44,7 @@ async def update(
     new_values: Equipamento,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if not new_values:
         raise statusMessage.NOT_DATA
     
@@ -60,7 +60,7 @@ async def delete(
     id: int,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if id <= 0 or id == None:
         raise statusMessage.NOT_DATA
     

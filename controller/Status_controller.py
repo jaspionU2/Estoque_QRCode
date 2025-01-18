@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response, status, Depends  
-from services.Status_service import Status_CRUD
+from service.Status_service import Status_CRUD
 
 from configs import statusMessage
 from configs.security import get_current_user
@@ -24,7 +24,7 @@ async def create(
     new_status_dispositivo: list[dict],
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if new_status_dispositivo is None or new_status_dispositivo is []:
         raise statusMessage.NOT_DATA
     
@@ -40,7 +40,7 @@ async def delete(
     id: int,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if id is None or id < 1:
         raise statusMessage.NOT_DATA
     

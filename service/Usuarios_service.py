@@ -45,16 +45,16 @@ class Aluno_CRUD():
     async def createAluno(new_aluno: Aluno) -> bool:
         try:
             with Session(engine) as session:
-                series = ["6", "7", "8", "9"]
-                turmas = ["A", "B", "C"]
+                # series = ["6", "7", "8", "9"]
+                # turmas = ["A", "B", "C"]
                 
                 data = new_aluno.__dict__
                 data.pop("_sa_instance_state", None)
                 
                 data["turma"] = new_aluno.turma.upper()
                 
-                if not (data["serie"] in series) or not (data["turma"] in turmas):
-                    return False
+                # if not (data["serie"] in series) or not (data["turma"] in turmas):
+                #     return False
                 
                 result = session.execute(insert(Aluno).values(data))
                 session.commit()
@@ -154,7 +154,7 @@ class Professor_CRUD:
             return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
         
     async def updateProfessor(Id: int, new_values: dict) -> bool:

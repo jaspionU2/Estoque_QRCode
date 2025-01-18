@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, status, Depends
 
-from services.Atribuicoes_service import Atribuicao_CRUD
+from service.Atribuicoes_service import Atribuicao_CRUD
 
 from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
 

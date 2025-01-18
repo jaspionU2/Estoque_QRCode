@@ -12,4 +12,4 @@ class Conta():
     email_conta: Mapped[str] = mapped_column(String(200), nullable=False, name='email_conta', unique=True)
     senha_conta: Mapped[str] = mapped_column(String(200), nullable=False, name='senha_conta')
     
-metadata = table_register.metadata
+

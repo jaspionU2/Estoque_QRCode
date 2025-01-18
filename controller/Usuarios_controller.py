@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, status, Depends
 
-from services.Usuarios_service import Aluno_CRUD, Professor_CRUD
+from service.Usuarios_service import Aluno_CRUD, Professor_CRUD
 
 from model.Model_Aluno import Aluno
 from model.Model_Professor import Professor
@@ -14,7 +14,7 @@ router_usuario = APIRouter()
 async def get_Professores(
     res: Response,
     current_user = Depends(get_current_user)
-) -> list[dict]:
+) -> list:
     professores = await Professor_CRUD.getAllProfessores()
 
     if professores is None:
@@ -25,10 +25,10 @@ async def get_Professores(
 
 @router_usuario.post('/createProfessor')
 async def create_professor(
-    new_professor: list[Professor],
+    new_professor: dict,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) :
     if not new_professor or new_professor is []: 
         raise statusMessage.NOT_DATA
         
@@ -45,7 +45,7 @@ async def update_Professor(
     new_values: dict,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if not new_values:
         raise statusMessage.NOT_DATA
     
@@ -61,7 +61,7 @@ async def delete_Professor(
     id: int,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if id <= 0 or id is None:
         raise statusMessage.NOT_DATA
     
@@ -107,7 +107,7 @@ async def update_aluno(
     new_values: Aluno,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if not new_values:
         raise statusMessage.NOT_DATA
     
@@ -123,7 +123,7 @@ async def delete(
     id: int,
     res: Response,
     current_user = Depends(get_current_user)
-) -> dict:
+) -> None:
     if id <= 0 or id is None:
         raise statusMessage.NOT_DATA
     
