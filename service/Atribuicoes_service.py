@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
-
-engine = create_engine(Config().DB_URI)
+from configs.register import engine
 
 class Atribuicao_CRUD:
     async def getAllAtrubuicoesFromAlunos():

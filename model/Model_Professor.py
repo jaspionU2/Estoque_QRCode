@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import (String, func)
+from sqlalchemy import (String)
 from sqlalchemy.orm import (registry, Mapped, mapped_column, relationship)
 from configs.register import table_register
 @table_register.mapped_as_dataclass
@@ -8,7 +8,5 @@ class Professor():
     
     id: Mapped[int] = mapped_column(name='id_professor', init=False, primary_key=True)
     nome: Mapped[str] = mapped_column(String(100), name='nome_professor', nullable=False)
-    # created_at: Mapped[datetime] = mapped_column(init=False, server_default=func.now())
-    id_materia: Mapped[int] = mapped_column(name="id_materia")
-    #materias: Mapped[list[str]] = relationship("Materia", back_populates="aluno")
+
     

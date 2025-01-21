@@ -4,12 +4,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_Materia import Materia
 
-engine = create_engine(Config().DB_URI)
+from configs.register import engine
 
 
 class Materia_CRUD:
 
-    async def getAllMaterias():
+    def getAllMaterias():
         try:
             with Session(engine) as session:
                 return session.execute(select(Materia)).scalars().all()
@@ -23,7 +23,7 @@ class Materia_CRUD:
             print("Erro inesperado: {err}")
             return False
 
-    async def createMateria(new_materia: list[Materia]):
+    def createMateria(new_materia: list[Materia]):
         try:
             with Session(engine) as session:
 
@@ -32,8 +32,7 @@ class Materia_CRUD:
                 for materia in materias:
                     materia.pop("_sa_instance_state", None)
 
-                result = session.execute(insert(Materia).
-                                        values(materias))
+                result = session.execute(insert(Materia).values(materias))
                 session.commit()
 
                 return result.rowcount > 0
@@ -47,12 +46,11 @@ class Materia_CRUD:
             print("Erro inesperado: {err}")
             return False
 
-    async def deleteMateria(Id: int):
+    def deleteMateria(Id: int):
         try:
             with Session(engine) as session:
 
-                result = session.execute(delete(Materia).
-                                        where(Materia.id == Id))
+                result = session.execute(delete(Materia).where(Materia.id == Id))
                 session.commit()
 
                 return result.rowcount > 0
