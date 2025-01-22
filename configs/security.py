@@ -17,7 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from model.Model_Conta import Conta
 
-engine = create_engine(Config().DB_URI)
+from configs.register import engine
 
 pwd_context = PasswordHash.recommended()
 
@@ -27,65 +27,73 @@ ACCESS_TOKEN_EXPIRES = 60
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="conta/doLogin")
 
+
 def get_password_hash(password: str):
     return pwd_context.hash(password)
+
 
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def getJWTToken(data: dict):
     try:
         to_encode = data.copy()
-        
-        expires_in = datetime.now(tz=ZoneInfo("UTC")) + timedelta(minutes=ACCESS_TOKEN_EXPIRES)
-        
+
+        expires_in = datetime.now(tz=ZoneInfo("UTC")) + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRES
+        )
+
         to_encode.update({"exp": expires_in})
-        
+
         jwt = encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        
+
         return jwt
     except ValueError as err:
         print(str(err))
-        
+
+
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_email = payload.get("sub")
-        
+
         if not user_email:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Não foi possivel validar as credenciais"
+                detail="Não foi possivel validar as credenciais",
             )
     except PyJWTError as err:
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Não foi possivel validar as credenciais"
-            )
-    
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Não foi possivel validar as credenciais",
+        )
+
     try:
         with Session(engine) as session:
-            user = session.execute(select(Conta).where(Conta.email_conta == user_email)).scalars().all()
-            
+            user = (
+                session.execute(select(Conta).where(Conta.email_conta == user_email))
+                .scalars()
+                .all()
+            )
+
             if not user:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Não foi possivel validar as credenciais"
+                    detail="Não foi possivel validar as credenciais",
                 )
-        
+
             return user
-            
+
     except SQLAlchemyError as err:
         print(err._message())
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Não foi possivel validar as credenciais"
-            )
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Não foi possivel validar as credenciais",
+        )
     except Exception as err:
         print("Erro inesperado: {err}")
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Não foi possivel validar as credenciais"
-            )
-    
-    
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Não foi possivel validar as credenciais",
+        )

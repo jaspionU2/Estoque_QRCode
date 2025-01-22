@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_Categoria import Categoria
 
-engine = create_engine(Config().DB_URI)
+from configs.register import engine
 
 
 class Categoria_CRUD:
@@ -24,8 +24,7 @@ class Categoria_CRUD:
     async def createCategoria(new_categoria: list[dict]):
         try:
             with Session(engine) as session:
-                result = session.execute(insert(Categoria).
-                                        values(new_categoria))
+                result = session.execute(insert(Categoria).values(new_categoria))
                 session.commit()
                 return result.rowcount > 0
         except SQLAlchemyError as err:
@@ -37,12 +36,11 @@ class Categoria_CRUD:
             session.rollback()
             print("Erro inesperado: {err}")
             return False
-    
+
     async def deleteCategoria(Id: int):
         try:
             with Session(engine) as session:
-                result = session.execute(delete(Categoria).
-                                where(Categoria.id == Id))
+                result = session.execute(delete(Categoria).where(Categoria.id == Id))
                 session.commit()
                 return result.rowcount > 0
         except SQLAlchemyError as err:
@@ -53,4 +51,4 @@ class Categoria_CRUD:
         except Exception as err:
             session.rollback()
             print("Erro inesperado: {err}")
-            return False     
+            return False
