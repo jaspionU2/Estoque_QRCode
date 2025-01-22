@@ -1,51 +1,88 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends
+
+from service.Atribuicoes_service import Atribuicao_CRUD
+
+from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
+
+from configs.security import get_current_user
+
+from configs import statusMessage
 
 router_atribuicao = APIRouter()  
 
-@router_atribuicao.get('/getAllAtribuicoes')
-async def get(res: Response) -> list:
-    atribuicoes = [{}] #service.getAllAtribuicoesFromAluno
-    atribuicoes.append([{}]) #service.getAllAtribuicoesFromProfessor
-    res.status_code = status.HTTP_200_OK
-    return atribuicoes
-
 @router_atribuicao.get('/getAllAtribuicoesFromAlunos')
-async def get(res: Response) -> list:
-    atribuicoes = [{}] #service.getAllAtribuicoesFromAluno
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromAlunos()
+    
+    if not atribuicoes:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
     return atribuicoes
 
 @router_atribuicao.get('/getAllAtribuicoesFromProfessores')
-async def get(res: Response) -> list:
-    atribuicoes = [{}] #service.getAllAtribuicoesFromProfessor
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromProfessores()
+    print(atribuicoes)
+    
+    if not atribuicoes:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
     return atribuicoes
 
 @router_atribuicao.post('/createNewAtribuicao')
-async def create(new_atribuicao: dict, res: Response) -> None:
-    if new_atribuicao == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create(
+    new_atribuicao: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_atribuicao or new_atribuicao is {}: 
+        raise statusMessage.NOT_DATA
     
-    # service.createAtribuicao(new_atribuicao)
+    sucess = Atribuicao_CRUD.createAtricuicao(new_atribuicao)
+    
+    if not sucess:
+        raise statusMessage.NOT_SUCCESS
+        
     res.status_code = status.HTTP_201_CREATED
 
 @router_atribuicao.put('/updateAtribuicao')
-async def update(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def update(
+    new_values: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_values:
+        raise statusMessage.NOT_DATA
     
-    # service.updateAtribuicao(new_values)
-    res.status_code = status.HTTP_200_OK
+    result = Atribuicao_CRUD.updateAtribuicao(new_values["id"], new_values)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+        
+    res.status_code = status.HTTP_202_ACCEPTED
     
 @router_atribuicao.delete('/deleteAtribuicao/{id}')
-async def delete(id: int, res: Response) -> None:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
-    
-    # sevice.deleteAtribuicao(id)
-    res.status_code = status.HTTP_200_OK
+        raise statusMessage.NOT_DATA
     
     
+    deleted = Atribuicao_CRUD.deleteAtribuicao(id)
+    
+    if not deleted:
+        raise statusMessage.NOT_SUCCESS
+        
+    res.status_code = status.HTTP_202_ACCEPTED

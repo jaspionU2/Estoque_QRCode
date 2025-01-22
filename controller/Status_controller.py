@@ -1,24 +1,52 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends  
+from service.Status_service import Status_CRUD
+
+from configs import statusMessage
+from configs.security import get_current_user
 
 router_status_dispositivo = APIRouter()  
 
 @router_status_dispositivo.get("/getAllStatus")
-async def get(res: Response) -> list:
-    status_dispositivo = [""] # service.getAllStatus_dispositivo()
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    status_dispositivo = await Status_CRUD.getAllStatus()
+    
+    if status_dispositivo is None or status_dispositivo is []:
+        raise statusMessage.NOT_FOUND
+    
+    res.status_code = status.HTTP_200_OK
     return status_dispositivo
 
 @router_status_dispositivo.post("/addNewStatus_dispositivo")
-async def create(new_status_dispositivo: dict, res: Response) -> None:
-    if new_status_dispositivo == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create(
+    new_status_dispositivo: list[dict],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if new_status_dispositivo is None or new_status_dispositivo is []:
+        raise statusMessage.NOT_DATA
     
-    # service.createNewStatus_dispositivo(new_status_dispositivo.value)
+    result = await Status_CRUD.createStatus(new_status_dispositivo)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_201_CREATED
 
-@router_status_dispositivo.delete("/deleteOneStatus_dispositivo")
-async def delete(status_dispositivo: dict, res: Response) -> None:
-    if status_dispositivo == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_status_dispositivo.delete("/deleteOneStatus_dispositivo/{id}")
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if id is None or id < 1:
+        raise statusMessage.NOT_DATA
     
-    # service.deleteStatus_dispositivo(status_dispositivo.value)
+    result = await Status_CRUD.deleteStatus(id)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_202_ACCEPTED

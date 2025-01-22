@@ -1,69 +1,135 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends
+
+from service.Usuarios_service import Aluno_CRUD, Professor_CRUD
+
+from model.Model_Aluno import Aluno
+from model.Model_Professor import Professor
+
+from configs import statusMessage
+from configs.security import get_current_user
 
 router_usuario = APIRouter()  
 
 @router_usuario.get('/getAllProfessores')
-async def get_Professores(res: Response) -> list:
-    professores = [{}] #service.getAllProfessores()
+async def get_Professores(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    professores = await Professor_CRUD.getAllProfessores()
+
+    if professores is None:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
     return professores
 
 @router_usuario.post('/createProfessor')
-async def create_Professor(new_professor: dict, res: Response) -> None:
-    if new_professor == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create_professor(
+    new_professor: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) :
+    if not new_professor or new_professor is []: 
+        raise statusMessage.NOT_DATA
+        
+    result = await Professor_CRUD.createProfessor(new_professor)
     
-    # service.createProfessor(new_professor)
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
     res.status_code = status.HTTP_201_CREATED
 
-@router_usuario.put('/updateProfessor') 
-async def update_Professor(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_usuario.put('/updateProfessor/{id}') 
+async def update_Professor(
+    id: int,
+    new_values: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_values:
+        raise statusMessage.NOT_DATA
     
-    # service.updateProfessor(new_values)
-    res.status_code = status.HTTP_200_OK
+    result = await Professor_CRUD.updateProfessor(id, new_values)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code  = status.HTTP_202_ACCEPTED
 
 @router_usuario.delete('/deleteProfessor/{id}')
-async def delete(id: int, res: Response) -> None:
-    if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+async def delete_Professor(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if id <= 0 or id is None:
+        raise statusMessage.NOT_DATA
     
-    # sevice.deleteProfessor(id)
-    res.status_code = status.HTTP_200_OK
+    result = await Professor_CRUD.deleteProfessor(id)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_202_ACCEPTED
 
 @router_usuario.get('/getAllAlunos')
-async def get_alunos(res: Response) -> list:
-    Alunos = [{}] #service.getAllAlunos()
+async def get_alunos(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    alunos = await Aluno_CRUD.getAllAlunos() 
+    
+    if alunos is None or alunos is []:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
-    return Alunos
+    return alunos
 
 @router_usuario.post('/createAluno')
-async def create_aluno(new_aluno: dict, res: Response) -> None:
-    if new_aluno == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create_aluno(
+    new_aluno: Aluno,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_aluno or new_aluno is []:
+        raise statusMessage.NOT_DATA
     
-    # service.createAluno(new_aluno)
+    result = await Aluno_CRUD.createAluno(new_aluno)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
     res.status_code = status.HTTP_201_CREATED
 
-@router_usuario.put('/updateAluno') 
-async def update_aluno(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_usuario.put('/updateAluno/{id}') 
+async def update_aluno(
+    id: int,
+    new_values: Aluno,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_values:
+        raise statusMessage.NOT_DATA
     
-    # service.updateAluno(new_values)
-    res.status_code = status.HTTP_200_OK
+    result = await Aluno_CRUD.updateAluno(id, new_values)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code  = status.HTTP_202_ACCEPTED
 
 @router_usuario.delete('/deleteAluno/{id}')
-async def delete(id: int, res: Response) -> None:
-    if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if id <= 0 or id is None:
+        raise statusMessage.NOT_DATA
     
-    # sevice.deleteAluno(id)
-    res.status_code = status.HTTP_200_OK
+    result = await Aluno_CRUD.deleteAluno(id)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_202_ACCEPTED

@@ -1,24 +1,54 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends 
+from service.Categorias_service import Categoria_CRUD
+
+from configs import statusMessage
+from configs.security import get_current_user
+
+from model.Model_Categoria import Categoria
 
 router_categoria = APIRouter()  
 
 @router_categoria.get("/getAllCategorias")
-async def get(res: Response) -> list:
-    categorias = [""] # service.getAllCategorias()
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    categorias = await Categoria_CRUD.getAllCategorias()
+    if categorias is None or categorias is []:
+        raise statusMessage.NOT_FOUND
+    
+    res.status_code = status.HTTP_200_OK
     return categorias
 
 @router_categoria.post("/addNewCategoria")
-async def create(new_categoria: dict, res: Response) -> None:
-    if new_categoria == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create(
+    new_categoria: list[dict],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if new_categoria is None or new_categoria is list[None]:
+        raise statusMessage.NOT_DATA
     
-    # service.createNewCategoria(new_categoria.value)
+    created = await Categoria_CRUD.createCategoria(new_categoria)
+    
+    if not created:
+        raise statusMessage.NOT_SUCCESS
+        
+    
+    res.status_code = status.HTTP_201_CREATED
 
-@router_categoria.delete("/deleteOneCategoria")
-async def delete(categoria: dict, res: Response) -> None:
-    if categoria == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_categoria.delete("/deleteOneCategoria{id}")
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if id is None or id < 1:
+        raise statusMessage.NOT_DATA
     
-    # service.deleteCategoria(categoria.value)
+    removed = await Categoria_CRUD.deleteCategoria(id)
+    
+    if not removed:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_202_ACCEPTED

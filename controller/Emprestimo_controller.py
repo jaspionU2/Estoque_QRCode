@@ -1,49 +1,83 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends 
+from service.Emprestimo_service import Emprestimo_CRUD
+from model.Model_Emprestimo import Emprestimo
+
+from configs import statusMessage
+from configs.security import get_current_user
 
 router_emprestimo = APIRouter()  
 
-@router_emprestimo.get('/getAllEmprestimos')
-async def get(res: Response) -> list:
-    emprestimos = [{}] #service.getAllEmprestimosFromAluno
-    emprestimos.append([{}]) #service.getAllEmprestimosFromProfessor
-    res.status_code = status.HTTP_200_OK
-    return emprestimos
-
 @router_emprestimo.get('/getAllEmprestimosFromAlunos')
-async def get(res: Response) -> list:
-    emprestimos = [{}] #service.getAllEmprestimosFromAluno
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    emprestimos = await Emprestimo_CRUD.getAllEmprestimosFromAlunos()
+    
+    if emprestimos is None or emprestimos is []:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
     return emprestimos
 
 @router_emprestimo.get('/getAllEmprestimosFromProfessores')
-async def get(res: Response) -> list:
-    emprestimos = [{}] #service.getAllEmprestimosFromProfessor
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    emprestimos = await Emprestimo_CRUD.getAllEmprestimosFromProfessores()
+    
+    if emprestimos is None or emprestimos is []:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
     return emprestimos
 
 @router_emprestimo.post('/createNewEmprestimo')
-async def create(new_emprestimo: dict, res: Response) -> None:
-    if new_emprestimo == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create(
+    new_emprestimo: list[Emprestimo],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_emprestimo or new_emprestimo is {}: 
+        raise statusMessage.NOT_DATA
+        
+    success = await Emprestimo_CRUD.createEmprestimo(new_emprestimo)
     
-    # service.createEmprestimo(new_emprestimo)
+    if not success:
+        raise statusMessage.NOT_SUCCESS
+        
     res.status_code = status.HTTP_201_CREATED
 
 @router_emprestimo.put('/updateEmprestimo')
-async def update(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def update(
+    id: int,
+    new_values: dict,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_values:
+        raise statusMessage.NOT_DATA
     
-    # service.updateEmprestimo(new_values)
-    res.status_code = status.HTTP_200_OK
+    result = await Emprestimo_CRUD.updateEmprestimo(id, new_values)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+        
+    res.status_code = status.HTTP_202_ACCEPTED
     
 @router_emprestimo.delete('/deleteEmprestimo/{id}')
-async def delete(id: int, res: Response) -> None:
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+        raise statusMessage.NOT_DATA
     
-    # sevice.deleteEmprestimo(id)
-    res.status_code = status.HTTP_200_OK
+    deleted = await Emprestimo_CRUD.deleteEmprestimo(id)
+    
+    if not deleted:
+        raise statusMessage.NOT_SUCCESS
+        
+    res.status_code = status.HTTP_202_ACCEPTED

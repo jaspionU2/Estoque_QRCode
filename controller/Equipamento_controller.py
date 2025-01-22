@@ -1,84 +1,72 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends
+from service.Equipamento_service import Equipmanento_CRUD
+from model.Model_Equipamento import Equipamento
+
+from configs.security import get_current_user
+
+from configs import statusMessage
 
 router_equipamentos = APIRouter()  
 
 @router_equipamentos.get('/getAllEquipamentos')
-async def get(res: Response) -> list:
-    equipamentos = [{}] #service.getAllEquipametos
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    equipamentos = await Equipmanento_CRUD.getAllEquipamentos()
+    
+    if not equipamentos:
+        raise statusMessage.NOT_FOUND
+    
     res.status_code = status.HTTP_200_OK
     return equipamentos
 
-@router_equipamentos.post('/createChromebook')
-async def create_chrome(new_chrome: dict, res: Response) -> None:
-    if new_chrome == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_equipamentos.post('/createEquipmanento')
+async def create(
+    tipo_equipamento: int,
+    new_equipmanento: list[Equipamento],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if new_equipmanento is None or new_equipmanento is []:
+        raise statusMessage.NOT_DATA
 
-    # service.createNewChrome(new_chrome)
-
-@router_equipamentos.post('/createIpad')
-async def create_ipad(new_ipad: dict, res: Response) -> None:
-    if new_ipad == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
-
-    # service.createNewIpad(new_ipad)
-
-@router_equipamentos.post('/createCarregador')
-async def create_ipad(new_carregador: dict, res: Response) -> None:
-    if new_carregador == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
-
-    # service.createNewCarregador(new_carregador)
+    sucess = await Equipmanento_CRUD.createEquipamento(new_equipmanento)
     
-@router_equipamentos.put("/updateChromeBook")
-async def update_chrome(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+    if not sucess:
+        raise statusMessage.NOT_SUCCESS
+        
+    res.status_code = status.HTTP_201_CREATED
     
-    #service.updateChrome(new_values)
-
-@router_equipamentos.put("/updateIpad")
-async def update_ipad(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_equipamentos.put("/updateEquipamento/{id}")
+async def update(
+    id: int,
+    new_values: Equipamento,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if not new_values:
+        raise statusMessage.NOT_DATA
     
-    #service.updateIpad(new_values)
-
-@router_equipamentos.put("/updateCarregador")
-async def update_caregador(new_values: dict, res: Response) -> None:
-    if new_values == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+    result = await Equipmanento_CRUD.updateEquipamento(id, new_values)
     
-    #service.updateCarregador(new_values)
+    if not result:
+        raise statusMessage.NOT_SUCCESS
     
-@router_equipamentos.delete("/deleteChomebook/{id}")
-async def delete_chrome(id: int, res: Response) -> None:
+    res.status_code  = status.HTTP_202_ACCEPTED
+    
+@router_equipamentos.delete("/deleteEquipamento/{id}")
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
     if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+        raise statusMessage.NOT_DATA
     
-    # sevice.deleteChromeBook(id)
-    res.status_code = status.HTTP_200_OK
+    result = await Equipmanento_CRUD.deleteEquipamento(id) 
     
-@router_equipamentos.delete("/deleteIpad/{id}")
-async def delete_ipad(id: int, res: Response) -> None:
-    if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
+    if not result:
+        raise statusMessage.NOT_SUCCESS
     
-    # sevice.deleteIpad(id)
-    res.status_code = status.HTTP_200_OK
-
-@router_equipamentos.delete("/deleteCarregador/{id}")
-async def delete_carregador(id: int, res: Response) -> None:
-    if id <= 0 or id == None:
-        res.status_code = status.HTTP_406_NOT_ACCEPTABLE
-        return None
-    
-    # sevice.deleteCarregador(id)
-    res.status_code = status.HTTP_200_OK  
+    res.status_code = status.HTTP_202_ACCEPTED

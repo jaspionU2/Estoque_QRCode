@@ -1,24 +1,53 @@
-from fastapi import APIRouter, Response, status  
+from fastapi import APIRouter, Response, status, Depends
+from service.Materia_service import Materia_CRUD
+from model.Model_Materia import Materia  
+
+from configs import statusMessage
+from configs.security import get_current_user
 
 router_materia = APIRouter()  
 
 @router_materia.get("/getAllMaterias")
-async def get(res: Response) -> list:
-    materias = [""] # service.getAllMaterias()
+async def get(
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> list:
+    materias = await Materia_CRUD.getAllMaterias()
+    
+    if materias is None or materias is []:
+        raise statusMessage.NOT_FOUND
+    
+    res.status_code = status.HTTP_200_OK
     return materias
 
 @router_materia.post("/addNewMateria")
-async def create(new_materia: dict, res: Response) -> None:
-    if new_materia == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+async def create(
+    new_materia: list[Materia],
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if new_materia is None or new_materia is []:
+        raise statusMessage.NOT_DATA
     
-    # service.createNewMateria(new_materia.value)
+    result = await Materia_CRUD.createMateria(new_materia)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_201_CREATED
 
-@router_materia.delete("/deleteOneMateria")
-async def delete(materia: dict, res: Response) -> None:
-    if materia == None:
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return None
+@router_materia.delete("/deleteOneMateria/{id}")
+async def delete(
+    id: int,
+    res: Response,
+    current_user = Depends(get_current_user)
+) -> None:
+    if id == None and id <= 0:
+        raise statusMessage.NOT_DATA
     
-    # service.deleteMateria(materia.value)
+    result = await Materia_CRUD.deleteMateria(id)
+    
+    if not result:
+        raise statusMessage.NOT_SUCCESS
+    
+    res.status_code = status.HTTP_202_ACCEPTED
