@@ -41,3 +41,21 @@
 #### - Gerar um html com mais detalhes relacionados aos testes -
 
 `coverage html`
+
+### < Migrations >
+
+#### - Gerar o arquivo de migration do Alembic -
+
+`alembic revision --autogenerate -m <adicionar comentario sobre migration(opcional)>`
+
+#### - Subir migration para o DB -
+
+`alembic upgrade head` ou passar o id da revision criada, identificado no arquivo como **Revision ID** `alembic upgrade <Revision ID da migration>`
+
+Caso queira, passe a quantidade de migrations que deseja subir para o banco com Ex. `alembic upgrade 2`
+
+#### - Desfazer migration do DB -
+
+`alembic downgrade head` ou passar o id da revision criada, identificado no arquivo como **Revision ID** `alembic downgrade <Revision ID da migration>`
+
+Caso queira, passe a quantidade de migrations que deseja desfazer no banco com Ex. `alembic upgrade 2`

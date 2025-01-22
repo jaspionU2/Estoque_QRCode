@@ -5,6 +5,8 @@ from model.Model_Emprestimo import Emprestimo
 from configs import statusMessage
 from configs.security import get_current_user
 
+from schema.Schema_Emprestimo_Atribuicao import SchemaEmprestimo, SchemaEmprestimoPublico
+
 router_emprestimo = APIRouter()  
 
 @router_emprestimo.get('/getAllEmprestimosFromAlunos')
@@ -33,21 +35,24 @@ async def get(
     res.status_code = status.HTTP_200_OK
     return emprestimos
 
-@router_emprestimo.post('/createNewEmprestimo')
+@router_emprestimo.post('/createNewEmprestimo', response_model=SchemaEmprestimoPublico)
 async def create(
-    new_emprestimo: list[Emprestimo],
+    new_emprestimo: SchemaEmprestimo,
     res: Response,
     current_user = Depends(get_current_user)
-) -> None:
+) -> SchemaEmprestimoPublico:
+    
     if not new_emprestimo or new_emprestimo is {}: 
         raise statusMessage.NOT_DATA
         
-    success = await Emprestimo_CRUD.createEmprestimo(new_emprestimo)
+    result = await Emprestimo_CRUD.createEmprestimo(new_emprestimo.model_dump())
     
-    if not success:
+    if not result:
         raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_201_CREATED
+    
+    return result
 
 @router_emprestimo.put('/updateEmprestimo')
 async def update(

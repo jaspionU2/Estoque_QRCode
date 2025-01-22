@@ -4,10 +4,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_Status import Status
 
-engine = create_engine(Config().DB_URI)
+from configs.register import engine
+
 
 class Status_CRUD:
-    
+
     async def getAllStatus():
         try:
             with Session(engine) as session:
@@ -21,15 +22,14 @@ class Status_CRUD:
             session.rollback()
             print("Erro inesperado: {err}")
             return False
-       
+
     async def createStatus(new_status: list[dict]):
         try:
             with Session(engine) as session:
-                
-                result = session.execute(insert(Status).
-                                values(new_status))
+
+                result = session.execute(insert(Status).values(new_status))
                 session.commit()
-                
+
                 return result.rowcount > 0
         except SQLAlchemyError as err:
             session.rollback()
@@ -40,15 +40,14 @@ class Status_CRUD:
             session.rollback()
             print("Erro inesperado: {err}")
             return False
-            
+
     async def deleteStatus(Id: int):
         try:
             with Session(engine) as session:
-                
-                result = session.execute(delete(Status).
-                                where(Status.id == Id))
+
+                result = session.execute(delete(Status).where(Status.id == Id))
                 session.commit()
-                
+
                 return result.rowcount > 0
         except SQLAlchemyError as err:
             session.rollback()
@@ -59,9 +58,3 @@ class Status_CRUD:
             session.rollback()
             print("Erro inesperado: {err}")
             return False
-        
-    
-            
-            
-    
-    
