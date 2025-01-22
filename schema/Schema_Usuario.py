@@ -16,7 +16,7 @@ class TurmaEnum(str, Enum):
     B = "B"
 
 class SchemaAluno(BaseModel):
-    nome: Annotated[str, Field(min_length=3, max_length=100, pattern='^[a-zA-Z\s]+$', examples=['Pablo Santana'])]
+    nome: Annotated[str, Field(min_length=3, max_length=100, pattern='^[a-zA-ZÀ-ü\s]+$', examples=['Pablo Santana'])]
     serie: Annotated[int, Field(examples=[1, 2, 3])]
     turma: Annotated[TurmaEnum, Field(examples=['A', 'B'])]
     
@@ -34,7 +34,7 @@ class SchemaAlunoPublic(SchemaAluno):
     
     
 class SchemaProfessor(BaseModel):
-    nome: Annotated[str, Field(min_length=3, max_length=100, pattern='^[a-zA-Z\s]+$', examples=['Jose Pereira'])]
+    nome: Annotated[str, Field(min_length=3, max_length=100, pattern='^[a-zA-ZÀ-ü\s]+$', examples=['Jose Pereira'])]
     
 class SchemaProfessorPublic(SchemaProfessor):
     id: int

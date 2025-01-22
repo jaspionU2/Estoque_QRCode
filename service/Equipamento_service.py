@@ -57,7 +57,7 @@ class Equipamento_CRUD:
             print(f"Erro inesperado: {str(err)}")
             return []
 
-        def createEquipamento(new_equipamento: dict):
+    def createEquipamento(new_equipamento: dict):
             try:
                 with Session(engine) as session:
                     result = session.execute(insert(Equipamento).

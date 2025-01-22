@@ -6,7 +6,7 @@ from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuica
 from configs.register import engine
 
 class Atribuicao_CRUD:
-    async def getAllAtrubuicoesFromAlunos():
+    async def getAllAtrubuicoesFromAlunos() -> bool | list:
         try:
             with Session(engine) as session:
                 query = select('*').select_from(text('getallatribuicoesfromaluno'))
@@ -34,12 +34,12 @@ class Atribuicao_CRUD:
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             print("Erro inesperado: {err}")
-            return None
+            return False
     
-    async def getAllAtrubuicoesFromProfessores():
+    async def getAllAtrubuicoesFromProfessores() -> bool | list:
         try:
             with Session(engine) as session:
                 query = select('*').select_from(text('getallatribuicoesfromprofessor'))
@@ -66,15 +66,17 @@ class Atribuicao_CRUD:
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             print("Erro inesperado: {err}")
-            return None
+            return False
     
-    async def createAtricuicao(new_atribuicao: list[dict]) -> bool:
+    async def createAtribuicao(new_atribuicao: dict) -> bool | dict:
         try:
             with Session(engine) as session:
-                session.execute(insert(Atribuicao).values(new_atribuicao))
+                session.execute(insert(Atribuicao).
+                                values(new_atribuicao).
+                                returning(Atribuicao.id, Atribuicao.usuario, Atribuicao.equipamento))
                 session.commit()
                 return True
         except SQLAlchemyError as err:
@@ -87,12 +89,13 @@ class Atribuicao_CRUD:
             print("Erro inesperado: {err}")
             return False
     
-    async def updateAtribuicao(Id: int, new_values: dict) -> bool:
+    async def updateAtribuicao(Id: int, new_values: dict) -> bool | dict:
         try:
             with Session(engine) as session:
                 result = session.execute(update(Atribuicao).
                                 where(Atribuicao.id == Id).
-                                values(**new_values))
+                                values(new_values).
+                                returning(Atribuicao.id, Atribuicao.usuario, Atribuicao.equipamento))
                 session.commit()
                 return result.rowcount > 0
         except SQLAlchemyError as err:

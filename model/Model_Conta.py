@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from configs.register import table_register
 
+
 @table_register.mapped_as_dataclass
 class Conta():
     __tablename__ = 'conta'
