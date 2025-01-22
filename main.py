@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from controller.Equipamento_controller import router_equipamentos
 from controller.Atribuicoes_controller import router_atribuicao
@@ -10,7 +11,23 @@ from controller.Status_controller import router_status_dispositivo
 from controller.Categoria_controller import router_categoria
 from controller.Conta_controller import router_conta
 
+origins = [
+    "https://estoqueqr.vercel.app",
+    "https://estoqueqr-git-main-yurigabriels-projects.vercel.app",
+    "https://estoqueqr-j0h3ctyw2-yurigabriels-projects.vercel.app",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.router.include_router(router_conta, prefix="/conta")
 app.router.include_router(router_equipamentos, prefix="/equipamento")
