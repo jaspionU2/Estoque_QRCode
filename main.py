@@ -29,6 +29,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get('/')
+async def main():
+    return {"text": "catambolas"}
+
 app.router.include_router(router_conta, prefix="/conta")
 app.router.include_router(router_equipamentos, prefix="/equipamento")
 app.router.include_router(router_atribuicao, prefix="/atribuicao")
