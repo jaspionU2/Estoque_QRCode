@@ -12,7 +12,8 @@ async def get(
     res: Response,
     current_user = Depends(get_current_user)
 ) -> list:
-    materias = await Materia_CRUD.getAllMaterias()
+    
+    materias = Materia_CRUD.getAllMaterias()
     
     if materias is None or materias is []:
         raise statusMessage.NOT_FOUND

@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from http import HTTPStatus
 
 from model.Model_Conta import Conta
-from main import app
+from index import app
 
 def test_getAllUsers_retorna_users():
     client = TestClient(app)

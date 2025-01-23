@@ -12,3 +12,4 @@ alembic.ini
 
 #ignore __pycache__ em qualquer sub-diretorio
 **/__pycache__/
+.vercel
