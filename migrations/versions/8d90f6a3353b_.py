@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 2a182389731e
+Revision ID: 8d90f6a3353b
 Revises: 
-Create Date: 2025-01-14 23:08:43.592590
+Create Date: 2025-01-23 12:16:42.576444
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2a182389731e'
+revision: str = '8d90f6a3353b'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -42,7 +42,6 @@ def upgrade() -> None:
     op.create_table('professor',
     sa.Column('id_professor', sa.Integer(), nullable=False),
     sa.Column('nome_professor', sa.String(length=100), nullable=False),
-    sa.Column('id_materia', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id_professor')
     )
     op.create_table('serie',
@@ -105,6 +104,7 @@ def upgrade() -> None:
     sa.Column('id_usuario', sa.Integer(), nullable=False),
     sa.Column('id_aluno', sa.Integer(), nullable=False),
     sa.Column('id_professor', sa.Integer(), nullable=False),
+    sa.Column('tipo_usuario', sa.Enum('ALUNO', 'PROFESSOR', name='tipo_usuario_enum'), nullable=False),
     sa.ForeignKeyConstraint(['id_aluno'], ['aluno.id_aluno'], ),
     sa.ForeignKeyConstraint(['id_professor'], ['professor.id_professor'], ),
     sa.PrimaryKeyConstraint('id_usuario')
