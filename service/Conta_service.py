@@ -73,23 +73,21 @@ class Conta_CRUD:
             print("Erro inesperado: " + str(err))
             return None
 
-    async def createConta(new_conta: Conta):
+    async def createConta(new_conta: dict):
         try:
             with Session(engine) as session:
-
-                conta = new_conta.__dict__
-
-                new_conta = conta
 
                 hashed_passwword = get_password_hash(new_conta["senha_conta"])
 
                 new_conta["senha_conta"] = hashed_passwword
 
-                result = session.execute(insert(Conta).values(new_conta))
+                result = session.execute(insert(Conta).
+                                         values(new_conta).
+                                         returning(Conta.id_conta, Conta.usuario_conta, Conta.email_conta, Conta.senha_conta))
 
                 session.commit()
 
-                return result.rowcount > 0
+                return result.fetchone()._asdict()
 
         except SQLAlchemyError as err:
             session.rollback()
@@ -111,11 +109,14 @@ class Conta_CRUD:
                     )
 
                 result = session.execute(
-                    update(Conta).where(Conta.id_conta == Id).values(new_value)
+                    update(Conta).
+                    where(Conta.id_conta == Id).
+                    values(new_value).
+                    returning(Conta.id_conta, Conta.usuario_conta, Conta.email_conta, Conta.senha_conta)
                 )
                 session.commit()
 
-                return result.rowcount > 0
+                return result.fetchone()._asdict()
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())
