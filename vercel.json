@@ -1,0 +1,61 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "controller/*.py",
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.12"
+            }
+        },
+        {
+            "src": "main.py",
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.12"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/atribuicoes",
+            "dest": "controller/Atribuicoes_controller.py"
+        },
+        {
+            "src": "/categoria",
+            "dest": "controller/Categoria_controller.py"
+        },
+        {
+            "src": "/conta",
+            "dest": "controller/Conta_controller.py"
+        },
+        {
+            "src": "/emprestimo",
+            "dest": "controller/Emprestimo_controller.py"
+        },
+        {
+            "src": "/equipamento",
+            "dest": "controller/Equipamento_controller.py"
+        },
+        {
+            "src": "/materia",
+            "dest": "controller/Materia_controller.py"
+        },
+        {
+            "src": "/serie",
+            "dest": "controller/Serie_controller.py"
+        },
+        {
+            "src": "/status",
+            "dest": "controller/Status_controller.py"
+        },
+        {
+            "src": "/usuarios",
+            "dest": "controller/Usuarios_controller.py"
+        },
+        {
+            "src": "/",
+            "dest": "/main.py"
+        }
+    ]
+}

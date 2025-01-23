@@ -6,7 +6,7 @@ from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuica
 from configs.register import engine
 
 class Atribuicao_CRUD:
-    async def getAllAtrubuicoesFromAlunos() -> bool | list:
+    async def getAllAtrubuicoesFromAlunos() -> list:
         try:
             with Session(engine) as session:
                 query = select('*').select_from(text('getallatribuicoesfromaluno'))
@@ -34,12 +34,12 @@ class Atribuicao_CRUD:
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return False
+            return None
         except Exception as err:
             print("Erro inesperado: {err}")
-            return False
+            return None
     
-    async def getAllAtrubuicoesFromProfessores() -> bool | list:
+    async def getAllAtrubuicoesFromProfessores() -> list:
         try:
             with Session(engine) as session:
                 query = select('*').select_from(text('getallatribuicoesfromprofessor'))
@@ -66,12 +66,12 @@ class Atribuicao_CRUD:
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return False
+            return None
         except Exception as err:
             print("Erro inesperado: {err}")
-            return False
+            return None
     
-    async def createAtribuicao(new_atribuicao: dict) -> bool | dict:
+    async def createAtribuicao(new_atribuicao: dict) -> bool:
         try:
             with Session(engine) as session:
                 session.execute(insert(Atribuicao).
@@ -89,7 +89,7 @@ class Atribuicao_CRUD:
             print("Erro inesperado: {err}")
             return False
     
-    async def updateAtribuicao(Id: int, new_values: dict) -> bool | dict:
+    async def updateAtribuicao(Id: int, new_values: dict) -> bool:
         try:
             with Session(engine) as session:
                 result = session.execute(update(Atribuicao).

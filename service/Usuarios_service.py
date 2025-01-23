@@ -13,7 +13,7 @@ from configs.register import engine
 
 class Usuario_Read():
 
-    async def getAllUsuarios() -> bool | dict:
+    async def getAllUsuarios() -> list:
             try:
                 with Session(engine) as session:
                     return session.execute(select(Usuario)).scalars().all()
@@ -25,12 +25,12 @@ class Usuario_Read():
             except Exception as err:
                 session.rollback()
                 print(f"Erro inesperado: {err}")
-                return False
+                return None
 
 class Aluno_CRUD:
     
 
-    async def getAllAlunos() -> bool | dict:
+    async def getAllAlunos() -> list:
         try:
             with Session(engine) as session:
                 return session.execute(select(Aluno)).scalars().all()
@@ -42,9 +42,9 @@ class Aluno_CRUD:
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")
-            return False
+            return None
 
-    async def getAlunoById(Id: int) -> bool | dict:
+    async def getAlunoById(Id: int) -> list:
         try:
             with Session(engine) as session:
                 return session.execute(
@@ -58,9 +58,9 @@ class Aluno_CRUD:
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")
-            return False
+            return None
 
-    async def createAluno(new_aluno: dict) -> bool | dict:
+    async def createAluno(new_aluno: dict) -> dict:
         try:
             with Session(engine) as session:
                 result = session.execute(
@@ -75,13 +75,13 @@ class Aluno_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return False
+            return None
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")
-            return False
+            return None
 
-    async def updateAluno(Id: int, new_values: dict) -> bool | dict:
+    async def updateAluno(Id: int, new_values: dict) -> dict:
         try:
             with Session(engine) as session:
                 result = session.execute(
@@ -96,11 +96,11 @@ class Aluno_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return False
+            return None
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")
-            return False
+            return None
 
     async def deleteAluno(Id: int) -> bool:
         try:
@@ -121,7 +121,7 @@ class Aluno_CRUD:
 
 class Professor_CRUD:
 
-    async def getAllProfessores() -> bool | dict:
+    async def getAllProfessores() -> list:
         try:
             with Session(engine) as session:
                 return session.execute(select(Professor)).all()
@@ -135,7 +135,7 @@ class Professor_CRUD:
             print(f"Erro inesperado: {err}")
             return None
 
-    async def getProfessorById(Id: int) -> bool | dict:
+    async def getProfessorById(Id: int) -> list:
         try:
             with Session(engine) as session:
                 return session.execute(
@@ -151,7 +151,7 @@ class Professor_CRUD:
             print(f"Erro inesperado: {err}")
             return None
 
-    async def createProfessor(new_professor: dict) -> bool | dict:
+    async def createProfessor(new_professor: dict) -> dict:
         try:
             with Session(engine) as session:
                 result = session.execute(
@@ -165,13 +165,13 @@ class Professor_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return False
+            return None
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")
-            return False
+            return None
 
-    async def updateProfessor(Id: int, new_values: dict) -> bool | dict:
+    async def updateProfessor(Id: int, new_values: dict) -> dict:
         try:
             with Session(engine) as session:
                 result = session.execute(
@@ -183,11 +183,11 @@ class Professor_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return False
+            return None
         except Exception as err:
             session.rollback()
             print("Erro inesperado: {err}")
-            return False
+            return None
 
     async def deleteProfessor(Id: int) -> bool:
         try:

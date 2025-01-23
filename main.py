@@ -11,15 +11,15 @@ from controller.Status_controller import router_status_dispositivo
 from controller.Categoria_controller import router_categoria
 from controller.Conta_controller import router_conta
 
+
 origins = [
-    "https://estoqueqr.vercel.app",
-    "https://estoqueqr-git-main-yurigabriels-projects.vercel.app",
-    "https://estoqueqr-j0h3ctyw2-yurigabriels-projects.vercel.app",
+    "https://estoque-qrc-ode-ashen.vercel.app/",
     "http://localhost",
     "http://localhost:8080",
 ]
 
 app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
