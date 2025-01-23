@@ -1,0 +1,30 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "controller/*.py",
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.12"
+            }
+        },
+        {
+            "src": "./index.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/atribuicoes",
+            "dest": "controller/Atribuicoes_controller.py"
+        },
+        {
+            "src": "/materia",
+            "dest": "controller/Materia_controller.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.py"
+        }
+    ]
+}

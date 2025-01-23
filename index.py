@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from controller.Equipamento_controller import router_equipamentos
 from controller.Atribuicoes_controller import router_atribuicao
@@ -11,6 +12,14 @@ from controller.Categoria_controller import router_categoria
 from controller.Conta_controller import router_conta
 
 app = FastAPI()
+
+app.add_middleware(
+   CORSMiddleware,
+    allow_origins = ["*"],
+    allow_credentials =True,
+    allow_methods = ["*"],
+    allow_headers= ["*"],
+)
 
 app.router.include_router(router_conta, prefix="/conta")
 app.router.include_router(router_equipamentos, prefix="/equipamento")
@@ -25,4 +34,4 @@ app.router.include_router(router_status_dispositivo, prefix="/status")
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=3000)
