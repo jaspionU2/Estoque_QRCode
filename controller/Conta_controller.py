@@ -10,6 +10,8 @@ from configs.security import verify_password, getJWTToken
 
 from model.Model_Conta import Conta
 
+from schema.Schema_Conta import SchemaConta, SchemaContaPublic
+
 router_conta = APIRouter()  
 
 @router_conta.post("/doLogin")
@@ -45,38 +47,49 @@ async def get(
     res.status_code = status.HTTP_200_OK
     return contas
 
-@router_conta.post("/addNewConta")
+@router_conta.post("/addNewConta", response_model=SchemaContaPublic)
 async def create(
-    new_conta: Conta,
+    new_conta: SchemaConta,
     res: Response
-) -> None:
+) -> SchemaContaPublic:
+    
     if not new_conta:
         raise statusMessage.NOT_DATA
     
-    created = await Conta_CRUD.createConta(new_conta)
+    new_conta = new_conta.model_copy(update={"email_conta": new_conta.email_conta}, check_deliverability=True)
+
+    conta_dict = new_conta.model_dump()
+    conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     
-    if not created:
+    result = await Conta_CRUD.createConta(conta_dict)
+    
+    if not result:
         raise statusMessage.NOT_SUCCESS
         
-    
     res.status_code = status.HTTP_201_CREATED
-    return new_conta.__dict__
+    return result
 
-@router_conta.put("/updateConta/{id}")
+@router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
 async def update(
     id: int,
-    new_values: dict,
+    new_values: SchemaConta,
     res: Response
-) -> None:
+) -> SchemaContaPublic:
+    
     if not new_values:
         raise statusMessage.NOT_DATA
     
-    result = await Conta_CRUD.updateConta(id, new_values)
+    conta_dict = new_values.model_dump()
+    conta_dict["senha_conta"] = new_values.senha_conta.get_secret_value()    
+    
+    result = await Conta_CRUD.updateConta(id, conta_dict)
     
     if not result:
         raise statusMessage.NOT_FOUND
     
     res.status_code  = status.HTTP_202_ACCEPTED
+    
+    return result
 
 @router_conta.delete("/deleteConta/{id}")
 async def delete(
