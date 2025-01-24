@@ -9,24 +9,26 @@ from configs.register import engine
 
 class Categoria_CRUD:
 
-    async def getAllCategorias() -> list:
+    async def getAllCategorias() -> bool | list:
         try:
             with Session(engine) as session:
                 return session.execute(select(Categoria)).scalars().all()
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
-            print("Erro inesperado: {err}")
-            return None
+            print(f"Erro inesperado: {err}")
+            return False
 
-    async def createCategoria(new_categoria: list[dict]):
+    async def createCategoria(new_categoria: dict) -> dict | bool:
         try:
             with Session(engine) as session:
-                result = session.execute(insert(Categoria).values(new_categoria))
+                result = session.execute(insert(Categoria).
+                                         values(new_categoria).
+                                         returning(Categoria.id, Categoria.categoria))
                 session.commit()
-                return result.rowcount > 0
+                return result.fetchone()._asdict()
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())
@@ -34,10 +36,10 @@ class Categoria_CRUD:
             return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
 
-    async def deleteCategoria(Id: int):
+    async def deleteCategoria(Id: int) -> bool:
         try:
             with Session(engine) as session:
                 result = session.execute(delete(Categoria).where(Categoria.id == Id))
@@ -50,5 +52,5 @@ class Categoria_CRUD:
             return None
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False

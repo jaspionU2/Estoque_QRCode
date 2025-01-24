@@ -1,7 +1,7 @@
-from sqlalchemy import create_engine, select, delete, insert
+from sqlalchemy import select, delete, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from configs.settings import Config
+
 from model.Model_Status import Status
 
 from configs.register import engine
@@ -9,7 +9,7 @@ from configs.register import engine
 
 class Status_CRUD:
 
-    async def getAllStatus():
+    async def getAllStatus() -> bool | list:
         try:
             with Session(engine) as session:
                 return session.execute(select(Status)).scalars().all()
@@ -17,35 +17,38 @@ class Status_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
 
-    async def createStatus(new_status: list[dict]):
+    async def createStatus(new_status: dict) -> bool | dict:
         try:
             with Session(engine) as session:
 
-                result = session.execute(insert(Status).values(new_status))
+                result = session.execute(insert(Status).
+                                         values(new_status).
+                                         returning(Status.id, Status.status))
                 session.commit()
 
-                return result.rowcount > 0
+                return result.fetchone()._asdict()
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
 
     async def deleteStatus(Id: int):
         try:
             with Session(engine) as session:
 
-                result = session.execute(delete(Status).where(Status.id == Id))
+                result = session.execute(delete(Status).
+                                         where(Status.id == Id))
                 session.commit()
 
                 return result.rowcount > 0
@@ -53,8 +56,8 @@ class Status_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False

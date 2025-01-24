@@ -1,15 +1,14 @@
-from sqlalchemy import create_engine, select, update, delete, insert
+from sqlalchemy import select, delete, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from configs.settings import Config
+
 from model.Model_Materia import Materia
 
 from configs.register import engine
 
-
 class Materia_CRUD:
 
-    def getAllMaterias():
+    def getAllMaterias() -> bool | list:
         try:
             with Session(engine) as session:
                 return session.execute(select(Materia)).scalars().all()
@@ -17,22 +16,39 @@ class Materia_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
 
-    def createMateria(new_materia: list[Materia]):
+    def createMateria(new_materia: dict) -> bool | dict:
         try:
             with Session(engine) as session:
 
-                materias = [materia_data.__dict__ for materia_data in new_materia]
 
-                for materia in materias:
-                    materia.pop("_sa_instance_state", None)
+                result = session.execute(insert(Materia).
+                                         values(new_materia).
+                                         returning(Materia.id, Materia.materia))
+                session.commit()
 
-                result = session.execute(insert(Materia).values(materias))
+                return result.fetchone()._asdict()
+        except SQLAlchemyError as err:
+            session.rollback()
+            print(err._message())
+            print(err._sql_message())
+            return False
+        except Exception as err:
+            session.rollback()
+            print(f"Erro inesperado: {err}")
+            return False
+
+    def deleteMateria(Id: int) -> bool:
+        try:
+            with Session(engine) as session:
+
+                result = session.execute(delete(Materia).
+                                         where(Materia.id == Id))
                 session.commit()
 
                 return result.rowcount > 0
@@ -40,26 +56,8 @@ class Materia_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
-        except Exception as err:
-            session.rollback()
-            print("Erro inesperado: {err}")
             return False
-
-    def deleteMateria(Id: int):
-        try:
-            with Session(engine) as session:
-
-                result = session.execute(delete(Materia).where(Materia.id == Id))
-                session.commit()
-
-                return result.rowcount > 0
-        except SQLAlchemyError as err:
-            session.rollback()
-            print(err._message())
-            print(err._sql_message())
-            return None
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False

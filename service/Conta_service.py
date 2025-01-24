@@ -31,10 +31,10 @@ class Conta_CRUD:
                 return conta[0]
         except SQLAlchemyError as err:
             print(err._message())
-            return None
+            return False
         except Exception as err:
-            print("Erro inesperado: {err}")
-            return None
+            print(f"Erro inesperado: {err}")
+            return False
 
     async def getAllConta():
         try:
@@ -44,10 +44,10 @@ class Conta_CRUD:
                 return contas
         except SQLAlchemyError as err:
             print(err._message())
-            return None
+            return False
         except Exception as err:
             print("Erro inesperado: " + str(err))
-            return None
+            return False
 
     async def getOneConta(email: str) -> Conta:
         try:
@@ -68,10 +68,10 @@ class Conta_CRUD:
                 return conta
         except SQLAlchemyError as err:
             print(err._message())
-            return None
+            return False
         except Exception as err:
             print("Erro inesperado: " + str(err))
-            return None
+            return False
 
     async def createConta(new_conta: dict):
         try:
@@ -141,5 +141,5 @@ class Conta_CRUD:
             return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False

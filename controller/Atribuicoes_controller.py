@@ -2,8 +2,6 @@ from fastapi import APIRouter, Response, status, Depends
 
 from service.Atribuicoes_service import Atribuicao_CRUD
 
-from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
-
 from configs.security import get_current_user
 from configs import statusMessage
 
@@ -16,13 +14,14 @@ async def get(
     res: Response,
     current_user = Depends(get_current_user)
 ) -> list:
-    atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromAlunos()
     
-    if not atribuicoes:
+    result_atribuicao = await Atribuicao_CRUD.getAllAtrubuicoesFromAlunos()
+    
+    if not result_atribuicao:
         raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
-    return atribuicoes
+    return result_atribuicao
 
 @router_atribuicao.get('/getAllAtribuicoesFromProfessores')
 async def get(
@@ -30,13 +29,15 @@ async def get(
     current_user = Depends(get_current_user)
 ) -> list:
     
-    atribuicoes = await Atribuicao_CRUD.getAllAtrubuicoesFromProfessores()
+    result_atribuicao = await Atribuicao_CRUD.getAllAtrubuicoesFromProfessores()
  
-    if not atribuicoes:
+    if not result_atribuicao:
         raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
-    return atribuicoes
+    
+    return result_atribuicao
+
 
 @router_atribuicao.post('/createNewAtribuicao', response_model=SchemaAtribuicaoPublico)
 async def create(
@@ -48,12 +49,14 @@ async def create(
     if not new_atribuicao or new_atribuicao is {}: 
         raise statusMessage.NOT_DATA
     
-    result = Atribuicao_CRUD.createAtricuicao(new_atribuicao.model_dump())
+    result_atribuicao = Atribuicao_CRUD.createAtribuicao(new_atribuicao.model_dump())
     
-    if not result:
+    if not result_atribuicao:
         raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_201_CREATED
+    
+    return result_atribuicao
     
 @router_atribuicao.put('/updateAtribuicao/{id}', response_model=SchemaAtribuicaoPublico)
 async def update(
@@ -66,14 +69,14 @@ async def update(
     if not new_values:
         raise statusMessage.NOT_DATA
     
-    result = Atribuicao_CRUD.updateAtribuicao(id, new_values.model_dump())
+    result_atribuicao = Atribuicao_CRUD.updateAtribuicao(id, new_values.model_dump())
     
-    if not result:
+    if not result_atribuicao:
         raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_202_ACCEPTED
     
-    return result
+    return result_atribuicao
     
 @router_atribuicao.delete('/deleteAtribuicao/{id}')
 async def delete(
@@ -86,9 +89,9 @@ async def delete(
         raise statusMessage.NOT_DATA
     
     
-    deleted = Atribuicao_CRUD.deleteAtribuicao(id)
+    result_deleted = Atribuicao_CRUD.deleteAtribuicao(id)
     
-    if not deleted:
+    if not result_deleted:
         raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_202_ACCEPTED

@@ -5,6 +5,8 @@ from service.Serie_service import Serie_CRUD
 from configs import statusMessage
 from configs.security import get_current_user
 
+from schema.Schema_Status_Categoria_Serie_Materia import SchemaSerie, SchemaSeriePublico
+
 router_serie = APIRouter()  
 
 @router_serie.get("/getAllSeries")
@@ -12,26 +14,28 @@ async def get(
     res: Response,
     current_user = Depends(get_current_user)
 ) -> list:
-    series = await Serie_CRUD.getAllSeries()
     
-    if series is None or series is []:
+    result_serie = await Serie_CRUD.getAllSeries()
+    
+    if result_serie is None or result_serie is []:
         raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
-    return series
+    return result_serie
 
-@router_serie.post("/addNewSerie")
+@router_serie.post("/addNewSerie", response_model=SchemaSeriePublico)
 async def create(
-    new_serie: list[Serie],
+    new_serie: SchemaSerie,
     res: Response,
     current_user = Depends(get_current_user)
-) -> None:
+) -> SchemaSeriePublico:
+    
     if new_serie is None or new_serie is []:
         raise statusMessage.NOT_DATA
     
-    result = await Serie_CRUD.createMateria(new_serie)
+    result_serie = await Serie_CRUD.createSerie(new_serie.model_dump())
     
-    if not result:
+    if not result_serie:
         raise statusMessage.NOT_SUCCESS
     
     res.status_code = status.HTTP_201_CREATED
@@ -45,9 +49,9 @@ async def delete(
     if id is None or id <= 0:
         raise statusMessage.NOT_DATA
     
-    result = await Serie_CRUD.deleteMateria(id)
+    result_serie = await Serie_CRUD.deleteSerie(id)
     
-    if not result:
+    if not result_serie:
         raise statusMessage.NOT_SUCCESS
     
     res.status_code = status.HTTP_202_ACCEPTED

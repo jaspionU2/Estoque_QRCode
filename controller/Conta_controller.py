@@ -19,15 +19,15 @@ async def login(
     res: Response,
     form_data: OAuth2PasswordRequestForm = Depends()
 ):
-    conta = await Conta_CRUD.getOneConta(form_data.username)
+    result_conta = await Conta_CRUD.getOneConta(form_data.username)
     
-    if not conta or not verify_password(form_data.password, conta["senha_conta"]):
+    if not result_conta or not verify_password(form_data.password, result_conta["senha_conta"]):
         raise HTTPException (
             status_code=400,
             detail="Incorrect email or password"
         )
     
-    token = getJWTToken(data={"sub": conta["email_conta"]})
+    token = getJWTToken(data={"sub": result_conta["email_conta"]})
     
     res.status_code = status.HTTP_200_OK
     return {
@@ -39,13 +39,13 @@ async def login(
 async def get(
     res: Response
 ) -> list[Conta]:
-    contas = await Conta_CRUD.getAllConta()
+    result_conta = await Conta_CRUD.getAllConta()
     
-    if contas is None or contas is []:
+    if result_conta is None or result_conta is []:
         raise statusMessage.NOT_FOUND
 
     res.status_code = status.HTTP_200_OK
-    return contas
+    return result_conta
 
 @router_conta.post("/addNewConta", response_model=SchemaContaPublic)
 async def create(
@@ -61,13 +61,13 @@ async def create(
     conta_dict = new_conta.model_dump()
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     
-    result = await Conta_CRUD.createConta(conta_dict)
+    result_conta = await Conta_CRUD.createConta(conta_dict)
     
-    if not result:
+    if not result_conta:
         raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_201_CREATED
-    return result
+    return result_conta
 
 @router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
 async def update(
@@ -82,14 +82,14 @@ async def update(
     conta_dict = new_values.model_dump()
     conta_dict["senha_conta"] = new_values.senha_conta.get_secret_value()    
     
-    result = await Conta_CRUD.updateConta(id, conta_dict)
+    result_conta = await Conta_CRUD.updateConta(id, conta_dict)
     
-    if not result:
+    if not result_conta:
         raise statusMessage.NOT_FOUND
     
     res.status_code  = status.HTTP_202_ACCEPTED
     
-    return result
+    return result_conta
 
 @router_conta.delete("/deleteConta/{id}")
 async def delete(

@@ -16,7 +16,7 @@ from configs.register import engine
 
 class Emprestimo_CRUD:
 
-    async def getAllEmprestimosFromAlunos():
+    async def getAllEmprestimosFromAlunos() -> bool | list:
         try:
             with Session(engine) as session:
                 query = select("*").select_from(text("getallemprestimosfromalunos"))
@@ -57,12 +57,12 @@ class Emprestimo_CRUD:
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             print("Erro inesperado: " + str(err))
-            return None
+            return False
 
-    async def getAllEmprestimosFromProfessores():
+    async def getAllEmprestimosFromProfessores() -> bool | list:
         try:
             with Session(engine) as session:
                 query = select("*").select_from(
@@ -107,12 +107,12 @@ class Emprestimo_CRUD:
         except SQLAlchemyError as err:
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             print("Erro inesperado: " + str(err))
-            return None
+            return False
 
-    async def createEmprestimo(new_emprestimo: dict):
+    async def createEmprestimo(new_emprestimo: dict) -> bool | dict:
         try:
             with Session(engine) as session:
                 result = session.execute(insert(Emprestimo).
@@ -132,7 +132,7 @@ class Emprestimo_CRUD:
             print(f"Erro inesperado: {err}")
             return False
 
-    async def updateEmprestimo(Id: int, new_value: dict):
+    async def updateEmprestimo(Id: int, new_value: dict) -> bool | dict:
         try:
             with Session(engine) as session:
                 result = session.execute(update(Emprestimo).
@@ -153,7 +153,7 @@ class Emprestimo_CRUD:
             print(f"Erro inesperado: {err}")
             return False
 
-    async def deleteEmprestimo(Id: int):
+    async def deleteEmprestimo(Id: int) -> bool:
         try:
             with Session(engine) as session:
 
@@ -165,7 +165,7 @@ class Emprestimo_CRUD:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return None
+            return False
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")

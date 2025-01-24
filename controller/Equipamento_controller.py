@@ -16,13 +16,13 @@ async def get_all_equipamentos(
     current_user=Depends(get_current_user)
 ) -> list:
     
-    result = Equipamento_CRUD.getAllEquipamentos()
+    result_equipamento = Equipamento_CRUD.getAllEquipamentos()
     
-    if result == []:
+    if result_equipamento == []:
         raise statusMessage.NOT_FOUND
     
     res.status_code = status.HTTP_200_OK
-    return result
+    return result_equipamento
 
 @router_equipamentos.post('/createEquipmanento', response_model=SchemaEquipamentoPublico)
 async def create(
@@ -34,14 +34,14 @@ async def create(
     if new_equipmanento is None or new_equipmanento is []:
         raise statusMessage.NOT_DATA
 
-    result =  Equipamento_CRUD.createEquipamento(new_equipmanento.model_dump())
+    result_equipamento =  Equipamento_CRUD.createEquipamento(new_equipmanento.model_dump())
     
-    if not result:
+    if not result_equipamento:
         raise statusMessage.NOT_SUCCESS
         
     res.status_code = status.HTTP_201_CREATED
     
-    return result
+    return result_equipamento
     
 @router_equipamentos.put("/updateEquipamento/{id}", response_model=SchemaEquipamentoPublico)
 async def update(
@@ -54,14 +54,14 @@ async def update(
     if not new_values:
         raise statusMessage.NOT_DATA
     
-    result =  Equipamento_CRUD.updateEquipamento(id, new_values.model_dump())
+    result_equipamento =  Equipamento_CRUD.updateEquipamento(id, new_values.model_dump())
     
-    if not result:
+    if not result_equipamento:
         raise statusMessage.NOT_SUCCESS
     
     res.status_code  = status.HTTP_202_ACCEPTED
     
-    return result
+    return result_equipamento
     
 @router_equipamentos.delete("/deleteEquipamento/{id}")
 async def delete(
@@ -72,9 +72,9 @@ async def delete(
     if id <= 0 or id == None:
         raise statusMessage.NOT_DATA
     
-    result =  Equipamento_CRUD.deleteEquipamento(id) 
+    result_equipamento =  Equipamento_CRUD.deleteEquipamento(id) 
     
-    if not result:
+    if not result_equipamento:
         raise statusMessage.NOT_SUCCESS
     
     res.status_code = status.HTTP_202_ACCEPTED
