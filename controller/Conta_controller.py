@@ -6,11 +6,11 @@ from service.Conta_service import Conta_CRUD
 
 from configs import statusMessage
 
-from configs.security import verify_password, getJWTToken
+from configs.security import verify_password, getJWTToken, enviar_codigo_para_email, verify_token_email
 
 from model.Model_Conta import Conta
 
-from schema.Schema_Conta import SchemaConta, SchemaContaPublic
+from schema.Schema_Conta import SchemaConta, SchemaContaPublic, SchemaEmail
 
 router_conta = APIRouter()  
 
@@ -47,6 +47,30 @@ async def get(
     res.status_code = status.HTTP_200_OK
     return contas
 
+@router_conta.get("/verify_token/{token}")
+async def create_account_token(
+    token: str,
+    res: Response
+):
+    access = verify_token_email(token)
+    
+    if not access:
+        ...
+    
+    """
+        Tarefas:
+            Criar uma coluna is_verifed na tabela conta
+            Alterar so metodos SELECT para pegar apenas contas onde is_verifed == true
+            Pensar em alguma coisa pra apagar as contas que não foram verificadas
+            Adicionar o metodo de enviar o email na rota /addNewConta
+    """
+
+@router_conta.post("/enviar_email")
+async def email(
+    email: SchemaEmail
+):
+    enviar_codigo_para_email(email.email_text)
+
 @router_conta.post("/addNewConta", response_model=SchemaContaPublic)
 async def create(
     new_conta: SchemaConta,
@@ -62,6 +86,7 @@ async def create(
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     
     result = await Conta_CRUD.createConta(conta_dict)
+    
     
     if not result:
         raise statusMessage.NOT_SUCCESS

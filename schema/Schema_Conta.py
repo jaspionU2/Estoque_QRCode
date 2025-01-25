@@ -51,3 +51,6 @@ class SchemaContaPublic(BaseModel):
     id_conta: int
     usuario_conta: str
     email_conta: EmailStr
+    
+class SchemaEmail(BaseModel):
+    email_text: EmailStr

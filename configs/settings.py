@@ -8,3 +8,5 @@ class Config(BaseSettings):
     )
     
     DB_URI: str
+    EMAIL_PASS: str
+    DOMAIN: str
