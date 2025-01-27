@@ -1,16 +1,20 @@
 from fastapi import APIRouter, Response, Depends, HTTPException, status
 
+from fastapi.responses import RedirectResponse
+
 from fastapi.security import OAuth2PasswordRequestForm
 
 from service.Conta_service import Conta_CRUD
 
 from configs import statusMessage
 
+from configs.settings import Config
+
 from configs.security import verify_password, getJWTToken, enviar_codigo_para_email, verify_token_email
 
 from model.Model_Conta import Conta
 
-from schema.Schema_Conta import SchemaConta, SchemaContaPublic, SchemaEmail
+from schema.Schema_Conta import SchemaConta, SchemaContaPublic
 
 router_conta = APIRouter()  
 
@@ -70,7 +74,9 @@ async def create_account_token(
                 detail="Erro ao verificar a conta"
             )
             
-        return "Conta verificada"
+        return RedirectResponse(
+            url=Config().VERIFY_ACCOUNT_PAGE_ROUTE
+        )
     
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

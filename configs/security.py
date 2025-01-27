@@ -140,13 +140,18 @@ def enviar_codigo_para_email(to_email: str) -> str:
         link = f"{Config().DOMAIN}/conta/verify_token?token={token}&email={to_email}"
         
         corpo = f"""
+            <img 
+                src="https://static.wixstatic.com/media/640d45_d4ae64361f654cd9a73f8101f6d9b5e8~mv2_d_14815_6035_s_5_3_2.jpg/v1/fit/w_2500,h_1330,al_c/640d45_d4ae64361f654cd9a73f8101f6d9b5e8~mv2_d_14815_6035_s_5_3_2.jpg"
+                alt="Colegio Mirim logo"
+                style="width: 200px; margin: auto;"
+            />
             <h1>Código para verificação de e-mail</h1>
-            <p>clique <a href={link}>aqui</a> para conifrmar o email</p>
+            <p>Clique <a href={link}>aqui</a> para validar o email</p>
         """
         
         msg = Message()
         
-        msg['Subject'] = "Teste python 2"
+        msg['Subject'] = "Verificação de conta"
         msg['From'] = "yuri.ferreira@colegiomirim.com.br"
         msg['To'] = to_email
         
