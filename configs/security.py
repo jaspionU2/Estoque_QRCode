@@ -128,9 +128,16 @@ def enviar_codigo_para_email(to_email: str) -> str:
     try:
         codigo = gerar_codigo()
         
-        token = encode({"code": codigo}, SECRET_KEY, algorithm=ALGORITHM)
+        expires_in = datetime.now(tz=ZoneInfo("UTC")) + timedelta(
+            minutes=10
+        )
         
-        link = f"{Config().DOMAIN}/conta/verify_token/{token}"
+        token = encode({
+            "code": codigo,
+            "exp": expires_in
+        }, SECRET_KEY, algorithm=ALGORITHM)
+        
+        link = f"{Config().DOMAIN}/conta/verify_token?token={token}&email={to_email}"
         
         corpo = f"""
             <h1>Código para verificação de e-mail</h1>

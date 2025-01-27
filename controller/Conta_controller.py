@@ -47,40 +47,59 @@ async def get(
     res.status_code = status.HTTP_200_OK
     return contas
 
-@router_conta.get("/verify_token/{token}")
+@router_conta.get("/verify_token")
 async def create_account_token(
     token: str,
-    res: Response
+    email: str
 ):
-    access = verify_token_email(token)
     
-    if not access:
-        ...
+    is_valid_token = verify_token_email(token)
     
-    """
-        Tarefas:
-            Criar uma coluna is_verifed na tabela conta
-            Alterar so metodos SELECT para pegar apenas contas onde is_verifed == true
-            Pensar em alguma coisa pra apagar as contas que não foram verificadas
-            Adicionar o metodo de enviar o email na rota /addNewConta
-    """
+    if is_valid_token:
+        if not email:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email inválido"
+            )
+        
+        updated = await Conta_CRUD.turn_verifed_account(email)
+        
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao verificar a conta"
+            )
+            
+        return "Conta verificada"
+    
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Erro ao validar o token"
+    )
 
-@router_conta.post("/enviar_email")
-async def email(
-    email: SchemaEmail
-):
-    enviar_codigo_para_email(email.email_text)
+@router_conta.delete("/delete_accounts_not_verified", response_model=dict)
+async def delete_accounts_not_verified() -> dict:
+    deleted = await Conta_CRUD.delete_accounts_not_verifed()
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ocorreu algum erro ao deletar as contas"
+        )
+    
+    return {
+        "detail": "Contas deletadas"
+    }
 
-@router_conta.post("/addNewConta", response_model=SchemaContaPublic)
+@router_conta.post("/addNewConta", response_model=dict)
 async def create(
     new_conta: SchemaConta,
     res: Response
-) -> SchemaContaPublic:
+) -> dict:
     
     if not new_conta:
         raise statusMessage.NOT_DATA
     
-    new_conta = new_conta.model_copy(update={"email_conta": new_conta.email_conta}, check_deliverability=True)
+    new_conta = new_conta.model_copy(update={"email_conta": new_conta.email_conta})
 
     conta_dict = new_conta.model_dump()
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
@@ -90,9 +109,14 @@ async def create(
     
     if not result:
         raise statusMessage.NOT_SUCCESS
+    
+    enviar_codigo_para_email(new_conta.email_conta)
         
     res.status_code = status.HTTP_201_CREATED
-    return result
+    return {
+        "detail": f"Email de verificação enviado para {new_conta.email_conta}",
+        "data": result
+    }
 
 @router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
 async def update(
