@@ -75,7 +75,10 @@ async def create_account_token(
             )
             
         return RedirectResponse(
-            url=Config().VERIFY_ACCOUNT_PAGE_ROUTE
+            url=Config().VERIFY_ACCOUNT_PAGE_ROUTE,
+            headers={
+                "verifed": True
+            }
         )
     
     raise HTTPException(
