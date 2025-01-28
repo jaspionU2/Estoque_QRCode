@@ -58,25 +58,25 @@ class SchemaAtribuicao(BaseModel):
     usuario: Annotated[int, Field(examples=[1, 2, 3])]
     equipamento: Annotated[int, Field(examples=[1, 2, 3])]
     
-    @field_validator('usuario', 'equipamento', mode='after')
-    @classmethod
-    def materia_professor_existe_no_banco(cls, value: int, info):
-        count_usuario = len(Usuario_Read.getAllUsuarios())
-        count_equipamento = len(Equipamento_CRUD.getAllEquipamentos())
+    # @field_validator('usuario', 'equipamento', mode='after')
+    # @classmethod
+    # def materia_professor_existe_no_banco(cls, value: int, info):
+    #     count_usuario =  len(Usuario_Read.getAllUsuarios())
+    #     count_equipamento =  len(Equipamento_CRUD.getAllEquipamentos())
         
-        if info.field_name == 'usuario':
-            if  value < 1 or value > count_usuario:
-                raise PydanticCustomError(
-                    'invalid value',
-                    f'The value {value} is not valid for {info.field_name}. Must be between 1 and {count_usuario}.'
-                )
-        elif info.field_name == 'equipamento':
-             if  value < 1 or value > count_equipamento:
-                raise PydanticCustomError(
-                    'invalid value',
-                    f'The value {value} is not valid for {info.field_name}. Must be between 1 and {count_equipamento}.'
-                )
-        return value
+    #     if info.field_name == 'usuario':
+    #         if  value < 1 or value > count_usuario:
+    #             raise PydanticCustomError(
+    #                 'invalid value',
+    #                 f'The value {value} is not valid for {info.field_name}. Must be between 1 and {count_usuario}.'
+    #             )
+    #     elif info.field_name == 'equipamento':
+    #          if  value < 1 or value > count_equipamento:
+    #             raise PydanticCustomError(
+    #                 'invalid value',
+    #                 f'The value {value} is not valid for {info.field_name}. Must be between 1 and {count_equipamento}.'
+    #             )
+    #     return value
 
 class SchemaAtribuicaoPublico(SchemaAtribuicao):
     id: int

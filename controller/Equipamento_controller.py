@@ -69,6 +69,7 @@ async def delete(
     res: Response,
     current_user = Depends(get_current_user)
 ) -> None:
+    
     if id <= 0 or id == None:
         raise statusMessage.NOT_DATA
     

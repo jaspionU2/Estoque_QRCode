@@ -27,7 +27,7 @@ class Serie_CRUD:
             with Session(engine) as session:
                 result = session.execute(insert(Serie).
                                          values(new_materia).
-                                         returning(Serie.id, Serie.Serie))
+                                         returning(Serie.id, Serie.serie))
                 session.commit()
 
                 return result.fetchone()._asdict()

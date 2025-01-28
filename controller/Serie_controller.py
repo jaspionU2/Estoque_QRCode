@@ -15,7 +15,7 @@ async def get(
     current_user = Depends(get_current_user)
 ) -> list:
     
-    result_serie = await Serie_CRUD.getAllSeries()
+    result_serie =  Serie_CRUD.getAllSeries()
     
     if result_serie is None or result_serie is []:
         raise statusMessage.NOT_FOUND
@@ -33,12 +33,14 @@ async def create(
     if new_serie is None or new_serie is []:
         raise statusMessage.NOT_DATA
     
-    result_serie = await Serie_CRUD.createSerie(new_serie.model_dump())
+    result_serie =  Serie_CRUD.createSerie(new_serie.model_dump())
     
     if not result_serie:
         raise statusMessage.NOT_SUCCESS
     
     res.status_code = status.HTTP_201_CREATED
+    
+    return result_serie
 
 @router_serie.delete("/deleteOneSerie")
 async def delete(
@@ -49,7 +51,7 @@ async def delete(
     if id is None or id <= 0:
         raise statusMessage.NOT_DATA
     
-    result_serie = await Serie_CRUD.deleteSerie(id)
+    result_serie =  Serie_CRUD.deleteSerie(id)
     
     if not result_serie:
         raise statusMessage.NOT_SUCCESS

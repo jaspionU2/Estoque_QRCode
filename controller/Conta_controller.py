@@ -56,8 +56,6 @@ async def create(
     if not new_conta:
         raise statusMessage.NOT_DATA
     
-    new_conta = new_conta.model_copy(update={"email_conta": new_conta.email_conta}, check_deliverability=True)
-
     conta_dict = new_conta.model_dump()
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     

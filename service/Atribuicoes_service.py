@@ -1,9 +1,11 @@
-from sqlalchemy import create_engine, select, update, delete, insert, text
+from sqlalchemy import  select, update, delete, insert, text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from configs.settings import Config
 from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
 from configs.register import engine
+from configs.customExceptions import CustomSQLException
+from typing import Literal
+import sys
 
 class Atribuicao_CRUD:
     async def getAllAtrubuicoesFromAlunos() -> bool | list:
@@ -36,7 +38,7 @@ class Atribuicao_CRUD:
             print(err._sql_message())
             return False
         except Exception as err:
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
     
     async def getAllAtrubuicoesFromProfessores() -> bool | list:
@@ -68,25 +70,41 @@ class Atribuicao_CRUD:
             print(err._sql_message())
             return False
         except Exception as err:
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
     
-    async def createAtribuicao(new_atribuicao: dict) -> bool | dict:
+    async def createAtribuicao(new_atribuicao: dict) -> Literal[False] | dict | Exception:
         try:
             with Session(engine) as session:
-                session.execute(insert(Atribuicao).
+                result = session.execute(insert(Atribuicao).
                                 values(new_atribuicao).
                                 returning(Atribuicao.id, Atribuicao.usuario, Atribuicao.equipamento))
+               
                 session.commit()
-                return True
+                return result.fetchone()._asdict()
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())
             print(err._sql_message())
-            return False
+            
+            return CustomSQLException(
+                value=new_atribuicao,
+                type_origin_error= str(err.orig.__class__.__name__),
+                sql_message= str(err.orig.diag.message_primary,)
+            )
+            
+            # return {
+            #     'type_exception': str(SQLAlchemyError.__name__),
+            #     'details': {
+            #     'db_error': str(err.orig.__class__.__name__),
+            #     'sql_message': str(err.orig.diag.message_primary),
+            #     'value': new_atribuicao
+            #     }
+            # }
+        
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
     
     async def updateAtribuicao(Id: int, new_values: dict) -> bool | dict:
@@ -97,7 +115,7 @@ class Atribuicao_CRUD:
                                 values(new_values).
                                 returning(Atribuicao.id, Atribuicao.usuario, Atribuicao.equipamento))
                 session.commit()
-                return result.rowcount > 0
+                return result.fetchone()._asdict()
         except SQLAlchemyError as err:
             session.rollback()
             print(err._message())
@@ -105,7 +123,7 @@ class Atribuicao_CRUD:
             return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False
             
     async def deleteAtribuicao(Id: int) -> bool:
@@ -122,5 +140,5 @@ class Atribuicao_CRUD:
             return False
         except Exception as err:
             session.rollback()
-            print("Erro inesperado: {err}")
+            print(f"Erro inesperado: {err}")
             return False

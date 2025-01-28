@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Response, status, Depends
+from fastapi import APIRouter, Response, status, Depends, HTTPException
 
 from service.Atribuicoes_service import Atribuicao_CRUD
 
 from configs.security import get_current_user
+from configs.customExceptions import CustomSQLException
 from configs import statusMessage
+
+from sqlalchemy.exc import SQLAlchemyError
 
 from schema.Schema_Emprestimo_Atribuicao import SchemaAtribuicao, SchemaAtribuicaoPublico
 
@@ -49,7 +52,21 @@ async def create(
     if not new_atribuicao or new_atribuicao is {}: 
         raise statusMessage.NOT_DATA
     
-    result_atribuicao = Atribuicao_CRUD.createAtribuicao(new_atribuicao.model_dump())
+    result_atribuicao = await Atribuicao_CRUD.createAtribuicao(new_atribuicao.model_dump())
+    
+    if isinstance(result_atribuicao, CustomSQLException):
+        
+        raise HTTPException(
+            status_code=statusMessage.INTERNAL_SERVER_ERROR.status_code,
+            detail=result_atribuicao.get_argument()
+        )
+    
+    # if isinstance(result_atribuicao, dict) and result_atribuicao.get('type_exception') is 'SQLAlchemyError':
+        
+    #     raise HTTPException(
+    #         status_code=statusMessage.INTERNAL_SERVER_ERROR.status_code,
+    #         detail=result_atribuicao.get('details')
+    #     )
     
     if not result_atribuicao:
         raise statusMessage.NOT_SUCCESS

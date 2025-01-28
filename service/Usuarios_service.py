@@ -13,7 +13,7 @@ from configs.register import engine
 
 class Usuario_Read():
 
-    async def getAllUsuarios() -> bool | dict:
+    def getAllUsuarios() -> bool | dict:
             try:
                 with Session(engine) as session:
                     return session.execute(select(Usuario)).scalars().all()

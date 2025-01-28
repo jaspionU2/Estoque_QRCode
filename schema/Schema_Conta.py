@@ -19,11 +19,11 @@ class SchemaConta(BaseModel):
     
     @field_validator('email_conta', mode='after')
     @classmethod
-    def validated_email(cls, value, value_deliverability=False):
+    def validated_email(cls, value):
         resolver = caching_resolver(timeout=10)
         
         try:
-           validated_email = validate_email(value, check_deliverability=value_deliverability, dns_resolver=resolver)
+           validated_email = validate_email(value, check_deliverability=True, dns_resolver=resolver)
            
            return validated_email.ascii_email
         except EmailNotValidError as err:

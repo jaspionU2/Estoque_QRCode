@@ -12,3 +12,8 @@ NOT_FOUND = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail="Dados não encontrados"
 )
+
+INTERNAL_SERVER_ERROR = HTTPException(
+    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    detail="Erro interno do servidor"
+)
