@@ -51,3 +51,13 @@ class SchemaContaPublic(BaseModel):
     id_conta: int
     usuario_conta: str
     email_conta: EmailStr
+
+class AddNewContaSchema(BaseModel):
+    id_conta: int
+    usuario_conta: str
+    email_conta: EmailStr
+    senha_conta: str
+    
+class AddNewContaReturnStm(BaseModel):
+    detail: str
+    data: AddNewContaSchema

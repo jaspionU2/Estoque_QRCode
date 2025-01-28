@@ -14,15 +14,16 @@ from configs.security import verify_password, getJWTToken, enviar_codigo_para_em
 
 from model.Model_Conta import Conta
 
-from schema.Schema_Conta import SchemaConta, SchemaContaPublic
+from schema.Schema_Conta import SchemaConta, SchemaContaPublic, AddNewContaReturnStm
+from schema.Schema_token import TokenPublic
 
 router_conta = APIRouter()  
 
-@router_conta.post("/doLogin")
+@router_conta.post("/doLogin", status_code=status.HTTP_200_OK, response_model=TokenPublic)
 async def login(
     res: Response,
     form_data: OAuth2PasswordRequestForm = Depends()
-):
+) -> TokenPublic:
     conta = await Conta_CRUD.getOneConta(form_data.username)
     
     if not conta or not verify_password(form_data.password, conta["senha_conta"]):
@@ -33,7 +34,6 @@ async def login(
     
     token = getJWTToken(data={"sub": conta["email_conta"]})
     
-    res.status_code = status.HTTP_200_OK
     return {
         "access_token": token,
         "type_token": "Bearer"
@@ -99,11 +99,11 @@ async def delete_accounts_not_verified() -> dict:
         "detail": "Contas deletadas"
     }
 
-@router_conta.post("/addNewConta", response_model=dict)
+@router_conta.post("/addNewConta", status_code=status.HTTP_201_CREATED, response_model=AddNewContaReturnStm)
 async def create(
     new_conta: SchemaConta,
     res: Response
-) -> dict:
+) -> AddNewContaReturnStm:
     
     if not new_conta:
         raise statusMessage.NOT_DATA
