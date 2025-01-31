@@ -31,29 +31,29 @@ class Conta_CRUD:
                 return conta[0]
         except SQLAlchemyError as err:
             print(err._message())
-            return False
+            return None
         except Exception as err:
-            print(f"Erro inesperado: {err}")
-            return False
+            print("Erro inesperado: {err}")
+            return None
 
     async def getAllConta():
         try:
             with Session(engine) as session:
-                contas = session.execute(select(Conta)).scalars().all()
+                contas = session.execute(select(Conta).where(Conta.is_verifed_conta == True)).scalars().all()
 
                 return contas
         except SQLAlchemyError as err:
             print(err._message())
-            return False
+            return None
         except Exception as err:
             print("Erro inesperado: " + str(err))
-            return False
+            return None
 
     async def getOneConta(email: str) -> Conta:
         try:
             with Session(engine) as session:
                 conta = (
-                    session.execute(select(Conta).where(Conta.email_conta == email))
+                    session.execute(select(Conta).where(Conta.email_conta == email).where(Conta.is_verifed_conta == True))
                     .scalars()
                     .all()
                 )
@@ -68,10 +68,10 @@ class Conta_CRUD:
                 return conta
         except SQLAlchemyError as err:
             print(err._message())
-            return False
+            return None
         except Exception as err:
             print("Erro inesperado: " + str(err))
-            return False
+            return None
 
     async def createConta(new_conta: dict):
         try:
@@ -80,6 +80,8 @@ class Conta_CRUD:
                 hashed_passwword = get_password_hash(new_conta["senha_conta"])
 
                 new_conta["senha_conta"] = hashed_passwword
+                
+                new_conta.update({"is_verifed_conta": False})
 
                 result = session.execute(insert(Conta).
                                          values(new_conta).
@@ -98,6 +100,29 @@ class Conta_CRUD:
             session.rollback()
             print("Erro inesperado: " + str(err))
             return False
+    
+    async def turn_verifed_account(email: str):
+        try:
+            with Session(engine) as session:
+
+                result = session.execute(
+                    update(Conta).
+                    where(Conta.email_conta == email).
+                    values({"is_verifed_conta": True})
+                )
+                session.commit()
+
+                return result.rowcount > 0
+        except SQLAlchemyError as err:
+            session.rollback()
+            print(err._message())
+            print(err._sql_message())
+            return False
+        except Exception as err:
+            session.rollback()
+            print("Erro inesperado: " + str(err))
+            return False
+
 
     async def updateConta(Id: int, new_value: dict):
         try:
@@ -114,6 +139,7 @@ class Conta_CRUD:
                     values(new_value).
                     returning(Conta.id_conta, Conta.usuario_conta, Conta.email_conta, Conta.senha_conta)
                 )
+                
                 session.commit()
 
                 return result.fetchone()._asdict()
@@ -141,5 +167,22 @@ class Conta_CRUD:
             return False
         except Exception as err:
             session.rollback()
-            print(f"Erro inesperado: {err}")
+            print("Erro inesperado: {err}")
+            return False
+    
+    async def delete_accounts_not_verifed():
+        try:
+            with Session(engine) as session:
+                result = session.execute(delete(Conta).where(Conta.is_verifed_conta == False))
+                session.commit()
+
+                return result.rowcount > 0
+        except SQLAlchemyError as err:
+            session.rollback()
+            print(err._message())
+            print(err._sql_message())
+            return False
+        except Exception as err:
+            session.rollback()
+            print("Erro inesperado: {err}")
             return False
