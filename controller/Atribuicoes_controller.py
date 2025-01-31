@@ -3,10 +3,8 @@ from fastapi import APIRouter, Response, status, Depends, HTTPException
 from service.Atribuicoes_service import Atribuicao_CRUD
 
 from configs.security import get_current_user
-from configs.customExceptions import CustomSQLException
+from configs.CustomResponse import CustomResponse
 from configs import statusMessage
-
-from sqlalchemy.exc import SQLAlchemyError
 
 from schema.Schema_Emprestimo_Atribuicao import SchemaAtribuicao, SchemaAtribuicaoPublico
 
@@ -54,19 +52,12 @@ async def create(
     
     result_atribuicao = await Atribuicao_CRUD.createAtribuicao(new_atribuicao.model_dump())
     
-    if isinstance(result_atribuicao, CustomSQLException):
+    if isinstance(result_atribuicao, CustomResponse):
         
         raise HTTPException(
             status_code=statusMessage.INTERNAL_SERVER_ERROR.status_code,
             detail=result_atribuicao.get_argument()
         )
-    
-    # if isinstance(result_atribuicao, dict) and result_atribuicao.get('type_exception') is 'SQLAlchemyError':
-        
-    #     raise HTTPException(
-    #         status_code=statusMessage.INTERNAL_SERVER_ERROR.status_code,
-    #         detail=result_atribuicao.get('details')
-    #     )
     
     if not result_atribuicao:
         raise statusMessage.NOT_SUCCESS

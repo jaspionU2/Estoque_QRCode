@@ -8,5 +8,6 @@ from model import Model_Carregador
 from model import Model_Professor_Materia
 from model import Model_Usuario
 from model import Model_Emprestimo
+from model import Model_Grupo
 from model import Model_Atribuicao_permanente
 from model import Model_Conta

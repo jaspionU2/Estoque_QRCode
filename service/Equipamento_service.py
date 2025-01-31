@@ -1,13 +1,12 @@
 from sqlalchemy import  select, update, delete, insert
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy.exc import SQLAlchemyError
 from model.Model_Equipamento import Equipamento
 from model.Model_Carregador import Carregador
 from model.Model_Categoria import Categoria
 from model.Model_Status import Status
-from sqlalchemy.orm import aliased
-
 from configs.register import engine
+from configs.CustomResponse import CustomResponse
 
 class Equipamento_CRUD:
 
@@ -55,7 +54,7 @@ class Equipamento_CRUD:
             print(f"Erro inesperado: {str(err)}")
             return []
 
-    def createEquipamento(new_equipamento: dict) -> bool | dict:
+    def createEquipamento(new_equipamento: dict) -> bool | dict | Exception:
             try:
                 with Session(engine) as session:
                     result = session.execute(insert(Equipamento).
@@ -71,7 +70,13 @@ class Equipamento_CRUD:
                 session.rollback()
                 print(err._message())
                 print(err._sql_message())
-                return False
+                
+                return CustomResponse(
+                    type_error=str(err.orig.__class__.__name__),
+                    sql_message=str(err.orig.diag.message_primary),
+                    value_input=new_equipamento
+                )
+                
             except Exception as err:
                 session.rollback()
                 print(f"Erro inesperado: {err}")

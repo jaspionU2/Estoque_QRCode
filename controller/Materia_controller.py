@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Response, status, Depends
+from fastapi import APIRouter, Response, status, Depends, HTTPException
 from service.Materia_service import Materia_CRUD  
 
 from configs import statusMessage
 from configs.security import get_current_user
+from configs.CustomResponse import CustomResponse
 
 from schema.Schema_Status_Categoria_Serie_Materia import SchemaMateria, SchemaMateriaPublico
 
@@ -32,7 +33,13 @@ async def create(
     if new_materia is None or new_materia is []:
         raise statusMessage.NOT_DATA
     
-    result_materia = await Materia_CRUD.createMateria(new_materia.model_dump())
+    result_materia = Materia_CRUD.createMateria(new_materia.model_dump())
+    
+    if isinstance(result_materia, CustomResponse):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=result_materia.to_dict()
+        )
     
     if not result_materia:
         raise statusMessage.NOT_SUCCESS

@@ -33,7 +33,7 @@ class SchemaSeriePublico(SchemaSerie):
     
 
 class SchemaMateria(BaseModel):
-    categoria: Annotated[str, Field(min_length=3, max_length=50, pattern='^[a-zA-ZÀ-ü\s]+$', examples=['Historia', 'Geografia'])]
+    materia: Annotated[str, Field(min_length=3, max_length=50, pattern='^[a-zA-ZÀ-ü\s]+$', examples=['Historia', 'Geografia'])]
     
 class SchemaMateriaPublico(SchemaMateria):
     id: int

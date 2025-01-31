@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
 from configs.register import engine
-from configs.customExceptions import CustomSQLException
+from configs.CustomResponse import CustomResponse
 from typing import Literal
 import sys
 
@@ -87,21 +87,12 @@ class Atribuicao_CRUD:
             print(err._message())
             print(err._sql_message())
             
-            return CustomSQLException(
+            return CustomResponse(
                 value=new_atribuicao,
-                type_origin_error= str(err.orig.__class__.__name__),
-                sql_message= str(err.orig.diag.message_primary,)
+                type_origin_error=str(err.orig.__class__.__name__),
+                sql_message=str(err.orig.diag.message_primary,)
             )
             
-            # return {
-            #     'type_exception': str(SQLAlchemyError.__name__),
-            #     'details': {
-            #     'db_error': str(err.orig.__class__.__name__),
-            #     'sql_message': str(err.orig.diag.message_primary),
-            #     'value': new_atribuicao
-            #     }
-            # }
-        
         except Exception as err:
             session.rollback()
             print(f"Erro inesperado: {err}")

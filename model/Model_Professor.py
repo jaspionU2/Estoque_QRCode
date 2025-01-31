@@ -8,5 +8,6 @@ class Professor():
     
     id: Mapped[int] = mapped_column(name='id_professor', init=False, primary_key=True)
     nome: Mapped[str] = mapped_column(String(100), name='nome_professor', nullable=False)
+    email: Mapped[str] = mapped_column(String(200), nullable=False, name='email_professor', unique=True)
 
     

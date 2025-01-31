@@ -11,4 +11,5 @@ class Equipamento():
     id_categoria_equipamento: Mapped[int] = mapped_column(ForeignKey('categoria.id_categoria'), name='id_categoria')
     id_status_equipamento: Mapped[int] = mapped_column(ForeignKey('status.id_status'), name='id_status')
     id_carregador: Mapped[int] = mapped_column(ForeignKey('carregador.id_carregador'), name='id_carregador')
+    id_grupo: Mapped[int] = mapped_column(ForeignKey('grupo.id_grupo'), name='id_grupo')
 

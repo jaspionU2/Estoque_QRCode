@@ -13,4 +13,5 @@ class Aluno():
     nome: Mapped[str] = mapped_column(String(100), nullable=False, name='nome_aluno')
     serie: Mapped[int] = mapped_column(ForeignKey('serie.id_serie'), nullable=False, name='serie_aluno')
     turma: Mapped[str] = mapped_column(sqlalchemy.Enum('A', 'B', name='turma_enum'), nullable=False, name='turma_aluno')
+    email: Mapped[str] = mapped_column(String(200), nullable=False, name='email_aluno', unique=True)
     
