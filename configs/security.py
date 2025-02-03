@@ -8,7 +8,7 @@ from random import randint
 from pwdlib import PasswordHash
 
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, WebSocket, WebSocketException
 
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -31,6 +31,8 @@ pwd_context = PasswordHash.recommended()
 SECRET_KEY = "segredo"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRES = 60 * 1.5
+
+WAITING_USERS: dict[str, WebSocket] = {}
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="conta/doLogin")
 
@@ -124,7 +126,7 @@ def gerar_codigo() -> str:
     
     return codigo
 
-def enviar_codigo_para_email(to_email: str) -> str:
+async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> str:
     try:
         codigo = gerar_codigo()
         
@@ -165,7 +167,11 @@ def enviar_codigo_para_email(to_email: str) -> str:
         
         smt.login(msg['From'], password)
         smt.sendmail(msg["From"], [msg['To']], msg.as_string().encode("utf-8"))
-        return codigo
+        
+        WAITING_USERS[to_email] = websocket
+        result: dict[str, str] = await websocket.receive_json()
+        if result["token"] == token and verify_token_email(result["token"]):
+            return True
     except MessageError as err:
         print(err)
         raise HTTPException(
@@ -178,8 +184,28 @@ def enviar_codigo_para_email(to_email: str) -> str:
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Erro ao enviar o email"
         )
+    except WebSocketException as err:
+        print(str(err))
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Erro ao preparar o email"
+        )
+        
+async def validar_conta(email: str, token: str):
+    try:
+        if email in WAITING_USERS:
+            await WAITING_USERS[email].send_json(data={
+                "token": token,
+                "email": email
+            })
+    except WebSocketException as err:
+        print(str(err))
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Erro ao preparar o email"
+        )
 
-def verify_token_email(token):
+async def verify_token_email(token):
     try:
         payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         codigo = payload.get("code")

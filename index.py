@@ -31,6 +31,8 @@ app.router.include_router(router_materia, prefix="/materia")
 app.router.include_router(router_serie, prefix="/serie")
 app.router.include_router(router_status_dispositivo, prefix="/status")
 
+
+
 if __name__ == "__main__":
     import uvicorn
 

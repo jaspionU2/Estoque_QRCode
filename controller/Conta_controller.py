@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Response, Depends, HTTPException, status
+from fastapi import APIRouter, Response, Depends, HTTPException, status, WebSocket, WebSocketException
 
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -10,13 +10,63 @@ from configs import statusMessage
 
 from configs.settings import Config
 
-from configs.security import verify_password, getJWTToken, enviar_codigo_para_email, verify_token_email
+from configs.security import verify_password, getJWTToken, enviar_codigo_para_email, validar_conta
 
 from model.Model_Conta import Conta
 
 from schema.Schema_Conta import SchemaConta, SchemaContaPublic
 
 router_conta = APIRouter()  
+
+@router_conta.get("/teste")
+async def teste():
+    return HTMLResponse("""
+           <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>teste websocket</title>
+</head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            var ws = new WebSocket("ws://localhost:8000/conta/ws");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+        </script>
+    </body>
+</html>             
+    """)
+    
+@router_conta.websocket("/ws")
+async def web(websocket: WebSocket):
+    print("ajhsb")
+    try:
+        await websocket.accept()
+        while True:
+            data = await websocket.receive_text()
+            print(data)
+            await websocket.send_text(f"Message text was: {data}")
+    except WebSocketException as err:
+        return str(err)
 
 @router_conta.post("/doLogin")
 async def login(
@@ -55,36 +105,11 @@ async def get(
 async def create_account_token(
     token: str,
     email: str
-):
-    
-    is_valid_token = verify_token_email(token)
-    
-    if is_valid_token:
-        if not email:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Email inválido"
-            )
-        
-        updated = await Conta_CRUD.turn_verifed_account(email)
-        
-        if not updated:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Erro ao verificar a conta"
-            )
-            
-        return RedirectResponse(
-            url=Config().VERIFY_ACCOUNT_PAGE_ROUTE,
-            headers={
-                "verifed": True
-            }
-        )
-    
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Erro ao validar o token"
-    )
+) -> dict:
+    await validar_conta(email, token)
+    return {
+        "detail": "conta criada"
+    }
 
 @router_conta.delete("/delete_accounts_not_verified", response_model=dict)
 async def delete_accounts_not_verified() -> dict:
@@ -102,8 +127,10 @@ async def delete_accounts_not_verified() -> dict:
 @router_conta.post("/addNewConta", response_model=dict)
 async def create(
     new_conta: SchemaConta,
-    res: Response
+    res: Response,
+    websocket: WebSocket
 ) -> dict:
+    
     
     if not new_conta:
         raise statusMessage.NOT_DATA
@@ -113,18 +140,27 @@ async def create(
     conta_dict = new_conta.model_dump()
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     
-    result = await Conta_CRUD.createConta(conta_dict)
+    await websocket.accept()
     
+    recived = await enviar_codigo_para_email(new_conta.email_conta, websocket)
     
-    if not result:
-        raise statusMessage.NOT_SUCCESS
-    
-    enviar_codigo_para_email(new_conta.email_conta)
+    if recived:
+        created = await Conta_CRUD.createConta(conta_dict)
         
-    res.status_code = status.HTTP_201_CREATED
+        
+        if not created:
+            raise statusMessage.NOT_SUCCESS
+        
+        
+            
+        res.status_code = status.HTTP_201_CREATED
+        return {
+            "detail": f"Email de verificação enviado para {new_conta.email_conta}",
+            "data": created
+        }
+        
     return {
-        "detail": f"Email de verificação enviado para {new_conta.email_conta}",
-        "data": result
+        "detail": "houve algum erro"
     }
 
 @router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
