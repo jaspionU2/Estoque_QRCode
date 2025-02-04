@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, Depends, HTTPException, status, WebSocket, WebSocketException
+from fastapi import APIRouter, Response, Depends, HTTPException, status, WebSocket, WebSocketException, WebSocketDisconnect
 
 from fastapi.responses import RedirectResponse, HTMLResponse
 
@@ -17,56 +17,6 @@ from model.Model_Conta import Conta
 from schema.Schema_Conta import SchemaConta, SchemaContaPublic
 
 router_conta = APIRouter()  
-
-@router_conta.get("/teste")
-async def teste():
-    return HTMLResponse("""
-           <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>teste websocket</title>
-</head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/conta/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>             
-    """)
-    
-@router_conta.websocket("/ws")
-async def web(websocket: WebSocket):
-    print("ajhsb")
-    try:
-        await websocket.accept()
-        while True:
-            data = await websocket.receive_text()
-            print(data)
-            await websocket.send_text(f"Message text was: {data}")
-    except WebSocketException as err:
-        return str(err)
 
 @router_conta.post("/doLogin")
 async def login(
@@ -124,13 +74,20 @@ async def delete_accounts_not_verified() -> dict:
         "detail": "Contas deletadas"
     }
 
-@router_conta.post("/addNewConta", response_model=dict)
+@router_conta.websocket("/addNewConta")
 async def create(
-    new_conta: SchemaConta,
     res: Response,
     websocket: WebSocket
-) -> dict:
+):
+    await websocket.accept()
     
+    data = await websocket.receive_json()
+    
+    new_conta: SchemaConta = SchemaConta(
+        usuario_conta=data.get("usuario_conta"),
+        email_conta=data.get("email_conta"),
+        senha_conta=data.get("senha_conta")
+    )
     
     if not new_conta:
         raise statusMessage.NOT_DATA
@@ -140,28 +97,17 @@ async def create(
     conta_dict = new_conta.model_dump()
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     
-    await websocket.accept()
-    
     recived = await enviar_codigo_para_email(new_conta.email_conta, websocket)
     
     if recived:
         created = await Conta_CRUD.createConta(conta_dict)
         
-        
         if not created:
             raise statusMessage.NOT_SUCCESS
-        
-        
             
         res.status_code = status.HTTP_201_CREATED
-        return {
-            "detail": f"Email de verificação enviado para {new_conta.email_conta}",
-            "data": created
-        }
         
-    return {
-        "detail": "houve algum erro"
-    }
+    res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 @router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
 async def update(

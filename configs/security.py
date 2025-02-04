@@ -126,7 +126,7 @@ def gerar_codigo() -> str:
     
     return codigo
 
-async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> str:
+async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> bool:
     try:
         codigo = gerar_codigo()
         
@@ -168,9 +168,13 @@ async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> str:
         smt.login(msg['From'], password)
         smt.sendmail(msg["From"], [msg['To']], msg.as_string().encode("utf-8"))
         
+        print("email enviado")
+        
         WAITING_USERS[to_email] = websocket
         result: dict[str, str] = await websocket.receive_json()
+        print("chegou")
         if result["token"] == token and verify_token_email(result["token"]):
+            print("email validado")
             return True
     except MessageError as err:
         print(err)
