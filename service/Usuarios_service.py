@@ -8,7 +8,7 @@ from model.Model_Aluno import Aluno
 from model.Model_Professor import Professor
 from model.Model_Usuario import Usuario
 
-from configs.register import engine
+from configs.db_configs import engine
 
 
 class Usuario_Read():

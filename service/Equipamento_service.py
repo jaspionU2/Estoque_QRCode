@@ -5,7 +5,7 @@ from model.Model_Equipamento import Equipamento
 from model.Model_Carregador import Carregador
 from model.Model_Categoria import Categoria
 from model.Model_Status import Status
-from configs.register import engine
+from configs.db_configs import engine
 from configs.CustomResponse import CustomResponse
 
 class Equipamento_CRUD:

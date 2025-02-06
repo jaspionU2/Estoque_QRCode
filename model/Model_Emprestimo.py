@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import (String, ForeignKey, TIMESTAMP)
 from sqlalchemy.orm import (registry, Mapped, mapped_column)
-from configs.register import table_register
+from configs.db_configs import table_register
 @table_register.mapped_as_dataclass
 class Emprestimo():
     __tablename__ = 'emprestimo'

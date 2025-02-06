@@ -7,7 +7,7 @@ from configs.security import get_password_hash
 
 from model.Model_Conta import Conta
 
-from configs.register import engine
+from configs.db_configs import engine
 
 
 class Conta_CRUD:

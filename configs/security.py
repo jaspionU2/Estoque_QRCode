@@ -18,13 +18,13 @@ from jwt.exceptions import PyJWTError
 
 from configs.settings import Config
 
-from sqlalchemy import create_engine, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from model.Model_Conta import Conta
 
-from configs.register import engine
+from configs.db_configs import engine
 
 pwd_context = PasswordHash.recommended()
 

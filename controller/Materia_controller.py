@@ -53,12 +53,16 @@ async def delete(
     res: Response,
     current_user = Depends(get_current_user)
 ) -> None:
+    
     if id == None and id <= 0:
         raise statusMessage.NOT_DATA
     
-    result_materia = await Materia_CRUD.deleteMateria(id)
+    result_materia = Materia_CRUD.deleteMateria(id)
     
-    if not result_materia:
-        raise statusMessage.NOT_SUCCESS
+    if isinstance(result_materia, CustomResponse):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=result_materia.to_dict()
+        )
     
     res.status_code = status.HTTP_202_ACCEPTED

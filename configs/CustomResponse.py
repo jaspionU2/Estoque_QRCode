@@ -24,3 +24,4 @@ class CustomResponse():
 
     def __str__(self):
         return f"{self.args}"
+

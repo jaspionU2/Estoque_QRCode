@@ -1,7 +1,7 @@
 from sqlalchemy import String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
-from configs.register import table_register
+from configs.db_configs import table_register
 
 
 @table_register.mapped_as_dataclass

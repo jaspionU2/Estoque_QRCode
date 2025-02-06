@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (registry, Mapped, mapped_column)
 from model.Model_Usuario import Usuario
 from model.Model_Equipamento import Equipamento
-from configs.register import table_register
+from configs.db_configs import table_register
 @table_register.mapped_as_dataclass
 class Atribuicao_permanente():
     __tablename__ = 'atribuicao_permanente'

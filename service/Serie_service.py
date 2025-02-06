@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from configs.settings import Config
 from model.Model_serie import Serie
 
-from configs.register import engine
+from configs.db_configs import engine
 
 
 class Serie_CRUD:

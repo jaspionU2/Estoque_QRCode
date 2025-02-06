@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from model.Model_Status import Status
 
-from configs.register import engine
+from configs.db_configs import engine
 
 
 class Status_CRUD:

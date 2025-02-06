@@ -11,7 +11,7 @@ from model.Model_Carregador import Carregador
 from model.Model_Aluno import Aluno
 from model.Model_Professor import Professor
 
-from configs.register import engine
+from configs.db_configs import engine
 
 
 class Emprestimo_CRUD:

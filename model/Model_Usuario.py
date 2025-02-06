@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey, CheckConstraint, Boolean
 from sqlalchemy.orm import (Mapped, mapped_column)
 import sqlalchemy
 
-from configs.register import table_register
+from configs.db_configs import table_register
 @table_register.mapped_as_dataclass
 class Usuario():
     __tablename__ = 'usuario'

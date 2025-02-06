@@ -112,7 +112,6 @@ async def create(
     
     result = await Conta_CRUD.createConta(conta_dict)
     
-    
     if not result:
         raise statusMessage.NOT_SUCCESS
     

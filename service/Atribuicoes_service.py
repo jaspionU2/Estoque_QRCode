@@ -2,7 +2,7 @@ from sqlalchemy import  select, update, delete, insert, text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from model.Model_Atribuicao_permanente import Atribuicao_permanente as Atribuicao
-from configs.register import engine
+from configs.db_configs import engine
 from configs.CustomResponse import CustomResponse
 from typing import Literal
 import sys
