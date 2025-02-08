@@ -126,20 +126,9 @@ def gerar_codigo() -> str:
     
     return codigo
 
-async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> bool:
+async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> str:
     try:
         codigo = gerar_codigo()
-        
-        expires_in = datetime.now(tz=ZoneInfo("UTC")) + timedelta(
-            minutes=10
-        )
-        
-        token = encode({
-            "code": codigo,
-            "exp": expires_in
-        }, SECRET_KEY, algorithm=ALGORITHM)
-        
-        link = f"{Config().DOMAIN}/conta/verify_token?token={token}&email={to_email}"
         
         corpo = f"""
             <img 
@@ -148,7 +137,7 @@ async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> bool:
                 style="width: 200px; margin: auto;"
             />
             <h1>Código para verificação de e-mail</h1>
-            <p>Clique <a href={link}>aqui</a> para validar o email</p>
+            <p>Seu codigo para validar o email é: {codigo}</p>
         """
         
         msg = Message()
@@ -170,12 +159,7 @@ async def enviar_codigo_para_email(to_email: str, websocket: WebSocket) -> bool:
         
         print("email enviado")
         
-        WAITING_USERS[to_email] = websocket
-        result: dict[str, str] = await websocket.receive_json()
-        print("chegou")
-        if result["token"] == token and verify_token_email(result["token"]):
-            print("email validado")
-            return True
+        return codigo
     except MessageError as err:
         print(err)
         raise HTTPException(

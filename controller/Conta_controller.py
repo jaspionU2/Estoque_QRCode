@@ -56,6 +56,7 @@ async def create_account_token(
     token: str,
     email: str
 ) -> dict:
+    print("token chegou")
     await validar_conta(email, token)
     return {
         "detail": "conta criada"
@@ -97,17 +98,33 @@ async def create(
     conta_dict = new_conta.model_dump()
     conta_dict["senha_conta"] = new_conta.senha_conta.get_secret_value()
     
+    print("enviar_codigo_para_email foi")
     recived = await enviar_codigo_para_email(new_conta.email_conta, websocket)
+    print("enviar_codigo_para_email voltou")
     
-    if recived:
+    data: str = await websocket.receive_text()
+    print("codigo chegou")
+    
+    """
+    {
+  "usuario_conta": "yuri",
+  "email_conta": "yurigabriel.f1012@gmail.com",
+  "senha_conta": "Yuri1234$"
+}
+    """
+    
+    if recived == data:
+        print("validou")
         created = await Conta_CRUD.createConta(conta_dict)
-        
         if not created:
             raise statusMessage.NOT_SUCCESS
-            
+
+        print("criou")
         res.status_code = status.HTTP_201_CREATED
+        await websocket.close()
         
     res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    await websocket.close()
 
 @router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
 async def update(
