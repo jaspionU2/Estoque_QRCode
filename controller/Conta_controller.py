@@ -16,6 +16,9 @@ from model.Model_Conta import Conta
 
 from schema.Schema_Conta import SchemaConta, SchemaContaPublic
 
+import asyncio
+from asyncio import TimeoutError
+
 router_conta = APIRouter()  
 
 @router_conta.post("/doLogin")
@@ -102,29 +105,44 @@ async def create(
     recived = await enviar_codigo_para_email(new_conta.email_conta, websocket)
     print("enviar_codigo_para_email voltou")
     
-    data: str = await websocket.receive_text()
-    print("codigo chegou")
-    
-    """
-    {
-  "usuario_conta": "yuri",
-  "email_conta": "yurigabriel.f1012@gmail.com",
-  "senha_conta": "Yuri1234$"
-}
-    """
-    
-    if recived == data:
-        print("validou")
-        created = await Conta_CRUD.createConta(conta_dict)
-        if not created:
-            raise statusMessage.NOT_SUCCESS
+    try:
+        print("temporizador começou")
+        async with asyncio.timeout(60):
+            data: str = await websocket.receive_text()
+            print("codigo chegou")
+            
+            """
+            {
+        "usuario_conta": "yuri",
+        "email_conta": "yurigabriel.f1012@gmail.com",
+        "senha_conta": "Yuri1234$"
+        }
+            """
+            
+            if recived == data:
+                print("validou")
+                created = await Conta_CRUD.createConta(conta_dict)
+                if not created:
+                    raise statusMessage.NOT_SUCCESS
 
-        print("criou")
-        res.status_code = status.HTTP_201_CREATED
-        await websocket.close()
+                print("criou")
+                await websocket.close(
+                    code=1000,
+                    reason="Usuario criado com sucesso"
+                )
+                
+        await websocket.close(
+            code=1011,
+            reason="Erro interno no servidor"
+
+        )
         
-    res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    await websocket.close()
+    except TimeoutError:
+        await websocket.close(
+            code=1011,
+            reason="Tempo de validação expirado"
+
+        )
 
 @router_conta.put("/updateConta/{id}", response_model=SchemaContaPublic)
 async def update(
