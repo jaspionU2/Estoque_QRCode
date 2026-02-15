@@ -1,0 +1,116 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 8px 16px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: white;
+  width: 100%;
+  outline: none;
+}
+
+.table-container {
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.custom-table th {
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.custom-table td {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.badge-matricula {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--primary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-badge.disponível { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
+.status-badge.em-uso { background: rgba(56, 189, 248, 0.1); color: #7dd3fc; }
+.status-badge.em-manutenção { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+.status-badge.reservado { background: rgba(168, 85, 247, 0.1); color: #c084fc; }
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.icon-btn.edit:hover { background: rgba(56, 189, 248, 0.1); color: var(--primary); }
+.icon-btn.delete:hover { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+
+.loader {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}

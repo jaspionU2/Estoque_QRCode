@@ -1,9 +1,42 @@
-version: '3'
-
 services:
-  app:
+  # Banco de Dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: estoque_qr_db
+    restart: always
+    environment:
+      POSTGRES_USER: user_admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: estoque_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Backend FastAPI
+  backend:
     build: .
+    container_name: estoque_qr_backend
+    restart: always
+    environment:
+      - DB_URI=postgresql://user_admin:password123@db:5432/estoque_db
     ports:
       - "8000:8000"
+    depends_on:
+      - db
     volumes:
-      - .:/Estoque_QRCode
+      - .:/app
+
+  # Frontend React (Nginx)
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: estoque_qr_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

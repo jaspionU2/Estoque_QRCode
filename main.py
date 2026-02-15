@@ -16,7 +16,11 @@ origins = [
     "https://estoqueqr-git-main-yurigabriels-projects.vercel.app",
     "https://estoqueqr-j0h3ctyw2-yurigabriels-projects.vercel.app",
     "http://localhost",
+    "http://localhost:8000",
     "http://localhost:8080",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://estoque.yuridevs.com.br",
 ]
 
 app = FastAPI()
